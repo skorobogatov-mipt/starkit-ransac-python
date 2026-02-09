@@ -22,7 +22,6 @@ class RANSAC3D:
                 axis=0
         )
 
-
     def fit(
             self, 
             object_type:type,
