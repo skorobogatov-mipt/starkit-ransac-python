@@ -3,7 +3,7 @@ from numpy.typing import NDArray
 from abc import ABC, abstractmethod
 from copy import deepcopy
 
-class SurfaceModel(ABC):
+class AbstractSurfaceModel(ABC):
     def __init__(self) -> None:
         super().__init__()
         self.k = None

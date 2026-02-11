@@ -1,9 +1,9 @@
 import numpy as np
-from ransac3d.abstract_surface import SurfaceModel
+from ransac3d.abstract_surface import AbstractSurfaceModel
 from numpy.typing import NDArray
 from copy import deepcopy
 
-class Point3D(SurfaceModel):
+class Point3D(AbstractSurfaceModel):
     def __init__(self) -> None:
         super().__init__()
         self.k = 1
