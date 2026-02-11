@@ -35,4 +35,3 @@ def test_point(point_data, acceptable_rmse):
     data_mean = np.mean(point_data, axis=0)
     assert np.linalg.norm(result_point - data_mean) < acceptable_rmse
 
-
