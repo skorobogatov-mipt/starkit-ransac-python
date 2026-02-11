@@ -39,6 +39,6 @@ class Point3D(AbstractSurfaceModel):
         )
         return distances
 
-    def calc_distance_one_point(self, point: NDArray):
+    def calc_distance_one_point(self, point: NDArray) -> float:
         return 0.
 
