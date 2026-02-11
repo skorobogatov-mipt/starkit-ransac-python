@@ -5,9 +5,11 @@ from ransac3d.surfaces.point import Point3D
 import numpy as np
 
 N_POINTS = 1000
+SEED = 42
 
 @pytest.fixture
 def point_data():
+    np.random.seed(SEED)
     return np.random.random((N_POINTS, 3))
 
 @pytest.fixture
@@ -15,7 +17,6 @@ def acceptable_rmse():
     return 0.2
     
 def test_point(point_data, acceptable_rmse):
-
     runsuck = RANSAC3D()
     runsuck.add_points(point_data)
 
