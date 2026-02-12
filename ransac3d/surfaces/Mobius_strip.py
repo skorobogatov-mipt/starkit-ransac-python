@@ -29,7 +29,9 @@ class Mobius_strip(AbstractSurfaceModel):
         normal = np.cross(AB, AC)
         n_norm = np.linalg.norm(normal)
         if n_norm < 1e-12:
-            raise ValueError("The Mobius strip cannot be constructed from the given points, since a circle cannot be constructed from the first three of them.")
+            raise ValueError("The Mobius strip cannot be " \
+            "constructed from the given points, since a circle cannot " \
+            "be constructed from the first three of them.")
         normal = normal / n_norm
         if normal[2] < 0:
             normal = -normal
@@ -202,7 +204,11 @@ class Mobius_strip(AbstractSurfaceModel):
             x = target_point[0]
             y = target_point[1]
             z = target_point[2]
-            optimal_v = np.clip(2*(-(radius - x *np.cos(theta_value) - y *np.sin(theta_value))*np.cos(theta_value*self.model['orientation']/2) + z*np.sin(theta_value*self.model['orientation']/2))/self.model['width'], -1.0, 1.0)
+            optimal_v = np.clip(2*
+                                (-(radius - x *np.cos(theta_value) - y *np.sin(theta_value))*
+                                     np.cos(theta_value*self.model['orientation']/2) +
+                                     z*np.sin(theta_value*self.model['orientation']/2))
+                                     /self.model['width'], -1.0, 1.0)
 
         a_vector = compute_a_vector(theta_value)
         b_vector = compute_b_vector(theta_value, target_point)
@@ -218,7 +224,10 @@ class Mobius_strip(AbstractSurfaceModel):
             y = target_point[1]
             z = target_point[2]
             half_theta = theta_values * self.model['orientation'] / 2.0
-            optimal_v = np.clip(2*(-(radius - x *np.cos(theta_values) - y *np.sin(theta_values))*np.cos(half_theta) + z*np.sin(half_theta))/self.model['width'], -1.0, 1.0)
+            optimal_v = np.clip(2*
+                                (-(radius - x *np.cos(theta_values) - y *np.sin(theta_values))*
+                                 np.cos(half_theta) + z*np.sin(half_theta))
+                                 /self.model['width'], -1.0, 1.0)
     
         a_vectors = compute_a_vector_array(theta_values)
         b_vectors = compute_b_vector_array(theta_values, target_point)

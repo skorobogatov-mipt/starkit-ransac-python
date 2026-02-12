@@ -56,7 +56,9 @@ def point_data():
     for i in range(N_POINTS):
         vector_in_circle_plane = np.cos(angles[i]) * start_vector + np.sin(angles[i]) * v1
         p = radius * vector_in_circle_plane
-        half_width_vector = half_width*(vector_in_circle_plane * np.cos(angles[i]*orientation/2) + normal*np.sin(angles[i]*orientation/2))
+        half_width_vector = half_width*(vector_in_circle_plane * 
+                                        np.cos(angles[i]*orientation/2) +
+                                        normal*np.sin(angles[i]*orientation/2))
         one_end = p+half_width_vector
         another_end = p-half_width_vector
         mobius_points[i, :] = another_end * values[i] + one_end * (1-values[i]) + center
@@ -88,5 +90,8 @@ def test_mobius_strip(point_data, acceptable_rmse, test_generator_mobius_strip):
     result_radius = result['radius']
     result_width = result['width']
 
-    assert((np.mean((result_center - test_generator_mobius_strip.model['center'])**2) + (result_radius - test_generator_mobius_strip.model['radius'])**2 + (result_width - test_generator_mobius_strip.model['width'])**2)/3 <  acceptable_rmse)
+    assert((np.sum((result_center - test_generator_mobius_strip.model['center'])**2) +
+            (result_radius - test_generator_mobius_strip.model['radius'])**2 +
+            (result_width - test_generator_mobius_strip.model['width'])**2)
+            /5 <  acceptable_rmse)
 
