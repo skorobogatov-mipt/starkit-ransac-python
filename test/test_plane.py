@@ -1,7 +1,7 @@
 import pytest
 
 from ransac3d.ransac_3d import RANSAC3D
-from ransac3d.surfaces.point import Point3D
+from ransac3d.surfaces.plane import Plane3D
 import numpy as np
 
 N_POINTS = 50
@@ -45,10 +45,11 @@ def test_plane(point_data, acceptable_rmse):
     )
     result = model.get_model()
     result_point = np.array([
-        result['x'], 
-        result['y'], 
-        result['z']
+        result['a'], 
+        result['b'], 
+        result['c'], 
+        result['d']
     ])
 
-    data_mean = np.mean(point_data, axis=0)
+    data_mean = np.array([0,0,1,0])
     assert np.linalg.norm(result_point - data_mean) < acceptable_rmse
