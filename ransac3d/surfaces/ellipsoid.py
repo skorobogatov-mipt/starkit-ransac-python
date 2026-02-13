@@ -50,6 +50,10 @@ class Ellipsoid3D(AbstractSurfaceModel):
         vals, axes = np.linalg.eig(A)
         axes_lengths = 1/np.sqrt(vals)
 
+        print(vals)
+        if (vals < 0).any():
+            raise ValueError("Could not fit an ellipse to points")
+
         self.model['center'] = v
         self.model['axes'] = axes
         self.model['axes_lengths'] = axes_lengths
