@@ -25,8 +25,12 @@ class Plane3D(AbstractSurfaceModel):
         self._model['a'] = (y2-y1)*(z3-z1)-(y3-y1)*(z2-z1)
         self._model['b'] = (x3-x1)*(z2-z1)-(x2-x1)*(z3-z1)
         self._model['c'] = (y3-y1)*(x2-x1)-(y2-y1)*(x3-x1)
-        if self._model['a']**2+self._model['a']**2+self._model['a']**2==0:
+        norm = self._model['a']**2+self._model['a']**2+self._model['a']**2
+        if norm==0:
             raise ValueError
+        self._model['a'] /= norm
+        self._model['b'] /= norm
+        self._model['c'] /= norm
         self._model['d'] = -self._model['a']*x1-self._model['b']*y1-self._model['c']*z1
         
 
