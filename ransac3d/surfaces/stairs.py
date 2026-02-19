@@ -160,7 +160,7 @@ class StepPlane(AbstractSurfaceModel):
         x_riser =  k_round * step_width
         dist_riser = np.abs(x_local - x_riser)
 
-        return np.minimum(dist_tread, dist_riser)
+        return dist_tread
 
     def calc_distance_one_point(self, point: NDArray) -> float:
         point = np.asarray(point, dtype=float).reshape(1, 3)
