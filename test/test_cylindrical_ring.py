@@ -1,8 +1,8 @@
 import pytest
 import numpy as np
-import open3d as o3d
-from ransac3d.ransac_3d import RANSAC3D
-from ransac3d.surfaces.cylindrical_ring import CylindricalRing
+# import open3d as o3d
+from starkit_ransac.ransac_3d import RANSAC3D
+from starkit_ransac.surfaces.cylindrical_ring import CylindricalRing
 import math
 
 N_POINTS = 1000
@@ -88,41 +88,41 @@ def cylindrical_ring_data():
     return np.array(points)
 
 
-def visualize_ring(points, model, title="Цилиндрическое кольцо"):
-
-    # Облако точек
-    pcd = o3d.geometry.PointCloud()
-    pcd.points = o3d.utility.Vector3dVector(points)
-    pcd.paint_uniform_color([0.5, 0.5, 0.5])  # Серый
-
-    result = model.get_model()
-    center_x = result['center_x']
-    center_y = result['center_y']
-    center_z = result['center_z']
-    inner_r = result['inner_radius']
-    outer_r = result['outer_radius']
-    height = result['height']
-
-    # Создаем сетку кольца
-    ring_mesh = create_ring_mesh(center_x, center_y, center_z, inner_r, outer_r, height)
-
-    # Система координат
-    coord_frame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=2.0)
-
-    print(f"  Центр: ({center_x:.3f}, {center_y:.3f}, {center_z:.3f})")
-    print(f"  Внутренний радиус: {inner_r:.3f}")
-    print(f"  Внешний радиус: {outer_r:.3f}")
-    print(f"  Высота: {height:.3f}")
-    print(f"  Толщина стенки: {result['thickness']:.3f}")
-    print(f"  Центральный радиус: {result['central_radius']:.3f}")
-
-    # Визуализация
-    o3d.visualization.draw_geometries(
-        [pcd, ring_mesh, coord_frame],
-        window_name=title,
-        width=1024,
-        height=768
-    )
+# def visualize_ring(points, model, title="Цилиндрическое кольцо"):
+#
+#     # Облако точек
+#     pcd = o3d.geometry.PointCloud()
+#     pcd.points = o3d.utility.Vector3dVector(points)
+#     pcd.paint_uniform_color([0.5, 0.5, 0.5])  # Серый
+#
+#     result = model.get_model()
+#     center_x = result['center_x']
+#     center_y = result['center_y']
+#     center_z = result['center_z']
+#     inner_r = result['inner_radius']
+#     outer_r = result['outer_radius']
+#     height = result['height']
+#
+#     # Создаем сетку кольца
+#     ring_mesh = create_ring_mesh(center_x, center_y, center_z, inner_r, outer_r, height)
+#
+#     # Система координат
+#     coord_frame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=2.0)
+#
+#     print(f"  Центр: ({center_x:.3f}, {center_y:.3f}, {center_z:.3f})")
+#     print(f"  Внутренний радиус: {inner_r:.3f}")
+#     print(f"  Внешний радиус: {outer_r:.3f}")
+#     print(f"  Высота: {height:.3f}")
+#     print(f"  Толщина стенки: {result['thickness']:.3f}")
+#     print(f"  Центральный радиус: {result['central_radius']:.3f}")
+#
+#     # Визуализация
+#     o3d.visualization.draw_geometries(
+#         [pcd, ring_mesh, coord_frame],
+#         window_name=title,
+#         width=1024,
+#         height=768
+#     )
 
 
 def test_cylindrical_ring_center(cylindrical_ring_data):
@@ -135,8 +135,6 @@ def test_cylindrical_ring_center(cylindrical_ring_data):
         1000,
         0.5
     )
-
-    visualize_ring(cylindrical_ring_data, model, "Кольцо в центре координат")
 
     result = model.get_model()
     assert abs(result['center_x']) < 0.3

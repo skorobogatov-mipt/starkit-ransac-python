@@ -1,5 +1,5 @@
 import numpy as np
-from ransac3d.abstract_surface import AbstractSurfaceModel
+from starkit_ransac.abstract_surface import AbstractSurfaceModel
 from numpy.typing import NDArray
 import math
 

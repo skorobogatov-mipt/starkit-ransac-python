@@ -1,7 +1,7 @@
 import numpy as np
 from numpy.typing import NDArray
 
-from ransac3d.abstract_surface import AbstractSurfaceModel
+from starkit_ransac.abstract_surface import AbstractSurfaceModel
 
 
 def _estimate_period(values: NDArray) -> float:

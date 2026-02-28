@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from mpl_toolkits.mplot3d import Axes3D
-from ransac3d.surfaces.cylinder import Cylinder
+from starkit_ransac.surfaces.cylinder import Cylinder
 
 N_POINTS = 1500
 SEED = 42
@@ -55,8 +55,13 @@ def acceptable_angle_error():
 def acceptable_height_error():
     return 0.1
 
-def perform_ransac_cylinder(points, normals, distance_threshold,
-                            max_iterations, min_inliers=None):
+def perform_ransac_cylinder(
+        points,
+        normals,
+        distance_threshold,
+        max_iterations,
+        min_inliers=None
+    ):
     best_model = None
     best_inliers = 0
     n_points = len(points)
@@ -82,8 +87,14 @@ def perform_ransac_cylinder(points, normals, distance_threshold,
         return best_model
     return None
 
-def _visualize_cylinder(points, model, true_center, true_axis,
-                        true_radius, true_height):
+def _visualize_cylinder(
+        points,
+        model,
+        true_center,
+        true_axis,
+        true_radius,
+        true_height
+    ):
 
     fig = plt.figure(figsize=(10, 8))
     ax = fig.add_subplot(111, projection='3d')
@@ -119,8 +130,12 @@ def _visualize_cylinder(points, model, true_center, true_axis,
     plt.title('RANSAC Cylinder Fitting')
     plt.show()
 
-def test_cylinder(cylinder_data, acceptable_rmse_cylinder,
-                  acceptable_angle_error, acceptable_height_error):
+def test_cylinder(
+        cylinder_data, 
+        acceptable_rmse_cylinder,
+        acceptable_angle_error, 
+        acceptable_height_error
+    ):
     points = cylinder_data['points']
     normals = cylinder_data['normals']
     model = perform_ransac_cylinder(

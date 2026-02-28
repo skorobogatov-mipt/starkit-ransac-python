@@ -1,7 +1,7 @@
 import pytest
 
-from ransac3d.ransac_3d import RANSAC3D
-from ransac3d.surfaces.stairs import StepPlane
+from starkit_ransac.ransac_3d import RANSAC3D
+from starkit_ransac.surfaces.stairs import StepPlane
 import numpy as np
 
 # Parameters of stairs

@@ -1,6 +1,6 @@
 import pytest
-from ransac3d.ransac_3d import RANSAC3D
-from ransac3d.surfaces.ELLIPSOID_NEW import EllipsoidModel
+from starkit_ransac.ransac_3d import RANSAC3D
+from starkit_ransac.surfaces.ellipsoid import EllipsoidModel
 import numpy as np
 
 N_POINTS = 500

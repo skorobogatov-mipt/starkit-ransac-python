@@ -1,7 +1,7 @@
 import pytest
 
-from ransac3d.ransac_3d import RANSAC3D
-from ransac3d.surfaces.point import Point3D
+from starkit_ransac.ransac_3d import RANSAC3D
+from starkit_ransac.surfaces.point import Point3D
 import numpy as np
 
 N_POINTS = 1000

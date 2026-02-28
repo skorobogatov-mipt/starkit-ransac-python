@@ -1,7 +1,7 @@
 import pytest
 
-from ransac3d.ransac_3d import RANSAC3D
-from ransac3d.surfaces.Mobius_strip import Mobius_strip
+from starkit_ransac.ransac_3d import RANSAC3D
+from starkit_ransac.surfaces.Mobius_strip import Mobius_strip
 import numpy as np
 
 N_ITERATIONS = 200
