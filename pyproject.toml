@@ -3,7 +3,7 @@ name = "starkit-ransac"
 version = "0.0.1"
 description = "A library for RANSAC with most common objects"
 authors = [
-    {name = "Skorobogatov Egor", email = "skorobogatov.ev@phystech.edu"}
+    { name = "Skorobogatov Egor", email = "skorobogatov.ev@phystech.edu" }
 ]
 license = "MIT"
 readme = "README.md"
@@ -15,6 +15,6 @@ dependencies = [
 requires = ["setuptools >= 77.0.3"]
 build-backend = "setuptools.build_meta"
 
-# [tool.setuptools.packages.find]
-# where = ["."]
-# include = ["ransac3d*"]
+[tool.setuptools.packages.find]
+where = ["src"]
+
