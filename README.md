@@ -36,3 +36,7 @@ To add you custom surface to this repo:
 3) Write tests. Make sure that they pass.
 4) Create a pull request.
 
+## Codestyle
+If you want to contribute to this library, make sure that your code adheres to the following code style:
+* classes are written in `EachWordStartingWithACapitalLetter` style
+* functions and variables are written in `snake_case`

@@ -127,7 +127,6 @@ def visualize_ring(points, model, title="Цилиндрическое кольц
 
 def test_cylindrical_ring_center(cylindrical_ring_data):
 
-
     ransac = RANSAC3D()
     ransac.add_points(cylindrical_ring_data)
 
