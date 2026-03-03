@@ -30,7 +30,6 @@ class CylindricalRing(AbstractSurfaceModel):
 
         axis = np.array([0, 0, 1])
 
-        #проекция на плоскость XY
         center = np.array([
             (p1[0] + p2[0]) / 2,
             (p1[1] + p2[1]) / 2,
@@ -45,10 +44,8 @@ class CylindricalRing(AbstractSurfaceModel):
         central_radius = np.mean(radii)
 
         height = abs(p1[2] - p2[2]) * 1.2
-        if height < 0.1:
-            height = 4.0  # значение по умолчанию
 
-        # Толщина - 20% от радиуса
+        # FIXME this is wrong!
         thickness = central_radius * 0.2
         inner_radius = max(0.1, central_radius - thickness / 2)
         outer_radius = central_radius + thickness / 2
