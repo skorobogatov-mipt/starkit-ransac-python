@@ -15,13 +15,13 @@ class Mobius_strip(AbstractSurfaceModel):
         ) -> None:
         super().__init__()
         self.model = {
-            "center": np.array(center),
+            "center": np.array(center).astype(np.float64),
             "radius": radius,
-            "normal": np.array(normal),
+            "normal": np.array(normal).astype(np.float64),
 
             "width": width,
             "orientation": orientation,
-            "start_vector": np.array(start_vector)
+            "start_vector": np.array(start_vector).astype(np.float64)
         }
         self.num_samples = 4
 
