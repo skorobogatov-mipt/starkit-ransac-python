@@ -2,6 +2,8 @@
 This class represents a staircase surface in 3D space.
 
 # Model parameters
+> This class does not fit the lateral width of the stairs, it only fits
+> staircase's height, tread rise and tread run.
 ## stair_height
 Total height of the staircase, computed as `max(z) - min(z)` from the sample.
 ## step_width
@@ -10,6 +12,7 @@ Horizontal step size along the staircase direction.
 Vertical rise per step.
 ## rotation_deg
 Rotation of the staircase around the Z axis, in degrees.
+
 
 # Model fitting
 Let $X$ be the matrix passed to `fit_model` with dimensions $N \times 3$, where

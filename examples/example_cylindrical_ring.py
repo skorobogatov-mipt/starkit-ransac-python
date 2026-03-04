@@ -11,7 +11,8 @@ def main():
         inner_r=0.2,
         outer_r=1.,
         height=0.5,
-        center=(0.42, -0.3, 7)
+        center=(0.42, -0.3, 7),
+        n_points=1000
     )
     ransac = RANSAC3D()
     ransac.add_points(data)

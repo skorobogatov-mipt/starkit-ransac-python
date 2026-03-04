@@ -72,7 +72,6 @@ def acceptable_center_error():
     """Допустимая ошибка определения центра."""
     return 0.6
 
-
 @pytest.fixture
 def acceptable_radii_error():
     """Допустимая ошибка определения полуосей."""

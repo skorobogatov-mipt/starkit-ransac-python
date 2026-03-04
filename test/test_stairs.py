@@ -38,7 +38,7 @@ def acceptable_rmse():
 def test_stairs(
         stairs_data,
         acceptable_rmse,
-        ):
+    ):
     # Fitting model stairs RANSAC
     runsuck = RANSAC3D()
     runsuck.add_points(stairs_data)
