@@ -31,11 +31,15 @@ generate_cylinder(cylinder:Cylinder, noise_sigma, n_points)
 that generates a set of 3d points for a given model.
 
 ## Visualization
-This module contains mesh generators for each surface, like:
+This module contains mesh generators for each surface. For example, here's a
+generation function for a cylinder:
 ```
+from starkit_ransac.surfaces.cylinder import Cylinder
 generate_cylinder_mesh(cylinder:Cylinder, color=...)
 ```
-That creates an `open3d.LineSet` object to be visualized.
+Each generation function accepts a surface model.
+That creates an array of objects that can be visualized via
+`open3d.visualization.draw_geometries`.
 
 # Writing your modules
 To write a custom surface detector, create a child class of SurfaceModel and
