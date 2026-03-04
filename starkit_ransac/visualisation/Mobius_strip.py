@@ -1,9 +1,12 @@
 import open3d as o3d
 import numpy as np
 
-def generate_mobius_mesh(mobius_strip, color=np.array([1, 0, 0]), n_theta=1000, n_width=100,
-        seed:int=42):
-    np.random.seed(seed)
+def generate_mobius_mesh(
+        mobius_strip, 
+        color=np.array([1, 0, 0]), 
+        n_theta=1000, 
+        n_width=100,
+    ):
     half_width = mobius_strip.model['width']/2
     center = mobius_strip.model['center']
     normal = mobius_strip.model['normal']

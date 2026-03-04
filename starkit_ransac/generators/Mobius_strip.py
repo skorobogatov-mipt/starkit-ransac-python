@@ -1,6 +1,13 @@
 import numpy as np
 
-def generate_mobius(mobius_strip, noise_sigma=0.1, n_points=10, n_uniform_ponts=0, box_center=np.array([0, 0, 0]), box_size=np.array([10, 10, 10])):
+def generate_mobius(
+        mobius_strip, 
+        noise_sigma=0.1, 
+        n_points=10, 
+        n_uniform_ponts=0, 
+        box_center=np.array([0, 0, 0]), 
+        box_size=np.array([10, 10, 10])
+    ):
     half_width = mobius_strip.model['width']/2
     center = mobius_strip.model['center']
     normal = mobius_strip.model['normal']
