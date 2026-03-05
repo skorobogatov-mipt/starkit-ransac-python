@@ -15,10 +15,7 @@ def generate_mobius(
     zero_angle_vector = mobius_strip.model['start_vector']
     orientation = mobius_strip.model['orientation']
 
-    print(normal.dtype)
-    print(zero_angle_vector.dtype)
     v1 = np.cross(normal, zero_angle_vector)
-    print(v1.dtype)
     v1 /= np.linalg.norm(v1)
     angles = np.linspace(0, 2*np.pi, n_points, endpoint=False)
     values = np.random.uniform(0, 1, size=n_points)
