@@ -1,7 +1,12 @@
+import pdb
+from time import sleep
+import open3d as o3d
 import numpy as np
 from numpy.typing import NDArray
-from ransac3d.abstract_surface import AbstractSurfaceModel
+from starkit_ransac.abstract_surface import AbstractSurfaceModel
 from copy import deepcopy
+
+from starkit_ransac.visualisation.circle import generate_circle_mesh
 
 
 class RANSAC3D:
@@ -11,14 +16,20 @@ class RANSAC3D:
     for robust fitting of geometric surface models to 3D point cloud data.
     """
     
-    def __init__(self) -> None:
+    def __init__(
+            self,
+            data:NDArray|None=None
+        ) -> None:
         """Initialize the RANSAC3D object with an empty point cloud.
         
         Returns
         -------
         None
         """
-        self.__data: NDArray = np.zeros((0, 3), dtype=float)
+        if data is None:
+            self.__data: NDArray = np.zeros((0, 3), dtype=float)
+        else:
+            self.__data = np.copy(data)
 
     def load_data_from_file(
             self,
@@ -41,16 +52,17 @@ class RANSAC3D:
         Parameters
         ----------
         points : NDArray
-            Array of 3D points to add, shape (N, 3) where N is the number of points.
+            Array of 3D points to add, shape (N, 3) where N is the number of
+            points.
             
         Returns
         -------
         None
         """
-        self.__data = np.concatenate(
-                (self.__data, points),
-                axis=0
-        )
+        if len(self.__data) == 0:
+            self.__data = np.copy(points)
+        else:
+            self.__data = np.concatenate((self.__data, points))
 
     def fit(
             self, 
@@ -87,6 +99,7 @@ class RANSAC3D:
         for _ in range(iter_num):
             sample = self.__sample()
             self.model.fit_model(sample)
+
             distances = self.model.calc_distances(self.__data)
             score = self.__score_from_distances(distances)
             

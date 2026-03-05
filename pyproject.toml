@@ -1,5 +1,5 @@
 [project]
-name = "ransac3d"
+name = "starkit-ransac"
 version = "0.0.1"
 description = "A library for RANSAC with most common objects"
 authors = [
@@ -8,13 +8,12 @@ authors = [
 license = "MIT"
 readme = "README.md"
 dependencies = [
-    "numpy==2.4.2"
+    "numpy>=1.23.5"
 ]
 
 [build-system]
 requires = ["setuptools >= 77.0.3"]
 build-backend = "setuptools.build_meta"
 
-# [tool.setuptools.packages.find]
-# where = ["."]
-# include = ["ransac3d*"]
+[tool.setuptools.packages.find]
+where = ["."]

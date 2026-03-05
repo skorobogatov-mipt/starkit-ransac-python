@@ -1,5 +1,5 @@
 import numpy as np
-from ransac3d.abstract_surface import AbstractSurfaceModel
+from starkit_ransac.abstract_surface import AbstractSurfaceModel
 from numpy.typing import NDArray
 from copy import deepcopy
 
@@ -39,6 +39,6 @@ class Point3D(AbstractSurfaceModel):
         )
         return distances
 
-    def calc_distance_one_point(self, point: NDArray):
+    def calc_distance_one_point(self, point: NDArray) -> float:
         return 0.
 

@@ -15,6 +15,32 @@ To install this module during development:
 pip install -e .
 ```
 
+# Modules
+## Surfaces
+This module represents all the surfaces included in this library.
+In each file, there's a class that encapsulates one surface e.g. Cylinder,
+Ellipsoid etc.
+
+## Generators
+This module contains all the generation functions for surfaces provided in
+this library.
+In each file, there's a function like: 
+```
+generate_cylinder(cylinder:Cylinder, noise_sigma, n_points)
+```
+that generates a set of 3d points for a given model.
+
+## Visualization
+This module contains mesh generators for each surface. For example, here's a
+generation function for a cylinder:
+```
+from starkit_ransac.surfaces.cylinder import Cylinder
+generate_cylinder_mesh(cylinder:Cylinder, color=...)
+```
+Each generation function accepts a surface model.
+That creates an array of objects that can be visualized via
+`open3d.visualization.draw_geometries`.
+
 # Writing your modules
 To write a custom surface detector, create a child class of SurfaceModel and
 place it in `ransac3d/surfaces/`. An example can be found at
@@ -36,3 +62,7 @@ To add you custom surface to this repo:
 3) Write tests. Make sure that they pass.
 4) Create a pull request.
 
+## Codestyle
+If you want to contribute to this library, make sure that your code adheres to the following code style:
+* classes are written in `EachWordStartingWithACapitalLetter` style
+* functions and variables are written in `snake_case`
