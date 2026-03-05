@@ -14,6 +14,16 @@ class Ellipsoid3D(AbstractSurfaceModel):
         self.num_samples = 9
 
     def fit_model(self, points: NDArray):
+        """
+            Fits an ellipsoid based on the following equation:
+            A x^2 + B xy + C y^2 + D xz + E yz + F x + G y + H z - 1 = 0
+            2 * m13, # xz
+            2 * m23, # yz
+            m33,     # z^2
+            -2 * b1, # x
+            -2 * b2, # y
+            -2 * b3  # z
+        """
         x = points[:, 0]
         y = points[:, 1]
         z = points[:, 2]
@@ -50,7 +60,6 @@ class Ellipsoid3D(AbstractSurfaceModel):
         vals, axes = np.linalg.eig(A)
         axes_lengths = 1/np.sqrt(vals)
 
-        print(vals)
         if (vals < 0).any():
             raise ValueError("Could not fit an ellipse to points")
 
@@ -73,4 +82,15 @@ class Ellipsoid3D(AbstractSurfaceModel):
         return 0.
 
     def calc_distances(self, points: NDArray) -> NDArray:
-        return np.zeros(1)
+        """
+            Calculates algebraic distance
+        """
+        poly = self.model['polynomial']
+        x = points[:, 0]
+        y = points[:, 1]
+        z = points[:, 2]
+        # numpy multiplication for speed
+        polynomials =  np.array([x**2, x*y, y**2, x*z, y*z, z**2, x, y, z]) * poly
+        return np.sum(polynomials, axis=-1) - 1
+
+
