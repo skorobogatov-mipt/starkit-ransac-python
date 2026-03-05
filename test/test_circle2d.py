@@ -1,4 +1,3 @@
-import pdb
 import numpy as np
 import pytest
 from starkit_ransac.generators.circle2d import generate_circle2D
