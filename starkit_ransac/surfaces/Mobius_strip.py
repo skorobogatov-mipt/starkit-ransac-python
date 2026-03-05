@@ -4,16 +4,24 @@ from numpy.typing import NDArray
 from copy import deepcopy
 
 class Mobius_strip(AbstractSurfaceModel):
-    def __init__(self) -> None:
+    def __init__(
+            self, 
+            center=[np.nan, np.nan, np.nan], 
+            radius=np.nan, 
+            normal=[np.nan, np.nan, np.nan], 
+            width=np.nan, 
+            orientation=np.nan, 
+            start_vector=[np.nan, np.nan, np.nan]
+        ) -> None:
         super().__init__()
         self.model = {
-            "center": np.nan,
-            "radius": np.nan,
-            "normal": np.nan,
+            "center": np.array(center).astype(np.float64),
+            "radius": radius,
+            "normal": np.array(normal).astype(np.float64),
 
-            "width": np.nan,
-            "orientation": np.nan,
-            "start_vector": np.nan
+            "width": width,
+            "orientation": orientation,
+            "start_vector": np.array(start_vector).astype(np.float64)
         }
         self.num_samples = 4
 
