@@ -1,29 +1,43 @@
 import pytest
 
-from ransac3d.ransac_3d import RANSAC3D
-from ransac3d.surfaces.ellipsoid import Ellipsoid3D
+from starkit_ransac.ransac_3d import RANSAC3D
+from starkit_ransac.surfaces.ellipsoid import Ellipsoid3D
 import numpy as np
 
-N_POINTS = 1000
-NOISE_POINTS = 1000
-SEED = 42
-np.random.seed(SEED)
 
-@pytest.fixture
-def ellipsoid_parameters():
-    ellipsoid = Ellipsoid3D()
-    found = False
-    while not found:
-        minimum_points = np.random.random((9, 3))
-        try:
-            ellipsoid.fit_model(minimum_points)
-        except ValueError as e:
-            pass
+from conftest import RNG
+from starkit_ransac.utils import normalize
+
+class TestEllipsoid3D:
+    # numbers of variants of a parameter
+    N_CENTERS = 5
+    N_RADII = 5
+    N_NORMALS = 5
+
+    MAX_OFFSET = 20
+    centers_list = (
+        RNG.random((N_CENTERS, 3)) * MAX_OFFSET
+    ).tolist()
+
+    MAX_RADIUS = 5
+    radii_list = (
+        RNG.random((N_RADII, 3)) * MAX_RADIUS
+    ).tolist()
+
+    normals_list = RNG.random((N_NORMALS,3,3))
+    normals_list = normalize(normals_list, -1)
+    nor
+    
 
 
-@pytest.fixture
-def acceptable_rmse():
-    pass
+    @pytest.fixture(scope='class', params=centers_list)
+    def center(self, request):
+        return np.array(request.param)
 
-def test_ellipsoid(ellipsoid_parameters):
-    pass
+    @pytest.fixture(scope="class", params=radii_list)
+    def radius(self, request):
+        return np.array(request.param)
+
+    @pytest.fixture(scope="class", params=normals)
+    def normal(self, request):
+        return request.param

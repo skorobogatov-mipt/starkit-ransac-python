@@ -117,7 +117,7 @@ class AbstractSurfaceModel(ABC):
     def __repr__(self):
         result = ''
         for key, value in self.model.items():
-            result += key + ' : ' + str(value) + '\n'
+            result += key + ' : \n' + str(value) + '\n'
         return result
 
     def get_model(self):

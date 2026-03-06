@@ -1,4 +1,5 @@
 import pdb
+from starkit_ransac.generators.ellipsoid import generate_ellipsoid
 from time import sleep
 import open3d as o3d
 import numpy as np
@@ -100,10 +101,12 @@ class RANSAC3D:
             sample = self.__sample()
             self.model.fit_model(sample)
 
+
             distances = self.model.calc_distances(self.__data)
             score = self.__score_from_distances(distances)
             
             if score > best_model_score:
+
                 best_model = deepcopy(self.model)
                 best_model_score = score
         return best_model

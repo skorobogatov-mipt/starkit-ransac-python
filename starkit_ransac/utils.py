@@ -51,3 +51,6 @@ def rotate_from_axis_to_axis(points, ax0, ax1):
     rotation_axis = np.cross(ax0, ax1)
     theta = np.arccos(np.dot(ax0, ax1))
     return rotate_rodrigues(points, rotation_axis, theta)
+
+def normalize(array, axis=None, keepdims=True):
+    return array / np.linalg.norm(array, axis=axis)
