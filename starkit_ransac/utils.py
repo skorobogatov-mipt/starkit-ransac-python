@@ -1,4 +1,5 @@
 import numpy as np
+from numpy.typing import NDArray
 
 def midpoint(p1, p2):
     p1 = np.asarray(p1)
@@ -52,5 +53,5 @@ def rotate_from_axis_to_axis(points, ax0, ax1):
     theta = np.arccos(np.dot(ax0, ax1))
     return rotate_rodrigues(points, rotation_axis, theta)
 
-def normalize(array, axis=None, keepdims=True):
-    return array / np.linalg.norm(array, axis=axis)
+def normalize(array, axis=None, keepdims=True) -> NDArray:
+    return array / np.linalg.norm(array, axis=axis, keepdims=keepdims)

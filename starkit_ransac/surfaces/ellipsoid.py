@@ -1,29 +1,53 @@
-from ctypes import ArgumentError
 import pdb
 from typing import Iterable
 import numpy as np
 from numpy.typing import NDArray
 from starkit_ransac.abstract_surface import AbstractSurfaceModel
+from starkit_ransac.utils import normalize
 
 class Ellipsoid3D(AbstractSurfaceModel):
     def __init__(
             self,
-            axes:Iterable=np.full((3,3), np.nan),
-            radii:Iterable=[np.nan, np.nan, np.nan],
-            center:Iterable=[np.nan, np.nan, np.nan],
-            polynomial:Iterable=[np.nan]*9
+            axes:Iterable|None=None,
+            radii:Iterable|None=None,
+            center:Iterable|None=None,
+            polynomial:Iterable|None=None
         ) -> None:
         super().__init__()
-        axes = np.array(axes) / np.linalg.norm(axes, axis=-1)
+        if axes is not None:
+            axes = np.array(axes)
 
-        if np.isnan(polynomial).any() and not np.isnan(axes).any():
-            polynomial = self.axes_to_polynomial(axes, radii, center)
+            if axes.shape != (3,3):
+                raise ValueError("'axes' must be a 3x3 array")
+
+            if np.dot(axes[0], axes[1]) != 0 or \
+               np.dot(axes[1], axes[2]) != 0 or \
+               np.dot(axes[2], axes[0]) != 0:
+                   raise ValueError("Axes must be perpendicular to each other.")
+            axes = normalize(axes, -1)
+
+        if radii is not None:
+            radii = np.array(radii)
+            if not (radii > 0).all():
+                raise ValueError("All radii must be greater than 0")
+            if radii.shape != (3,):
+                raise ValueError("There must be 3 radii values")
+
+        if center is not None:
+            center = np.array(center)
+            if center.shape != (3,):
+                raise ValueError("Center must be 3d vector")
+
+        if polynomial is not None:
+            polynomial = np.array(polynomial)
+            if polynomial.shape != (9,):
+                raise ValueError("Polynomial must have 9 coefficients")
         
         self.model = {
-            'axes' : np.array(axes),
-            'radii' : np.array(radii),
-            'center' : np.array(center),
-            'polynomial' : np.array(polynomial)
+            'axes' : axes,
+            'radii' : radii,
+            'center' : center,
+            'polynomial' : polynomial
         }
         self.num_samples = 9
 
