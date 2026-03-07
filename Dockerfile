@@ -17,8 +17,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Open3D
-RUN pip3 install --no-cache-dir open3d
-RUN pip install --upgrade pip setuptools
+RUN pip install --upgrade pip setuptools "numpy<2,>=1.23.5"
+RUN pip3 install --no-cache-dir open3d pytest
 
 WORKDIR /root/starkit-ransac
 
