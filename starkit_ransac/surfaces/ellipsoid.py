@@ -16,13 +16,12 @@ class Ellipsoid3D(AbstractSurfaceModel):
         super().__init__()
         if axes is not None:
             axes = np.array(axes)
-
             if axes.shape != (3,3):
                 raise ValueError("'axes' must be a 3x3 array")
 
-            if np.dot(axes[0], axes[1]) != 0 or \
-               np.dot(axes[1], axes[2]) != 0 or \
-               np.dot(axes[2], axes[0]) != 0:
+            if not np.allclose(np.dot(axes[0], axes[1]), 0) or \
+               not np.allclose(np.dot(axes[1], axes[2]), 0) or \
+               not np.allclose(np.dot(axes[2], axes[0]), 0):
                    raise ValueError("Axes must be perpendicular to each other.")
             axes = normalize(axes, -1)
 
@@ -42,6 +41,18 @@ class Ellipsoid3D(AbstractSurfaceModel):
             polynomial = np.array(polynomial)
             if polynomial.shape != (9,):
                 raise ValueError("Polynomial must have 9 coefficients")
+
+        if axes is not None and\
+           radii is not None and\
+           center is not None:
+               axes, radii = self.sort_axes_and_radii(axes, radii)
+               if polynomial is None:
+                    polynomial = self.axes_to_polynomial(axes, radii, center)
+               else:
+                    raise ValueError(
+                            "Polynomial must be None,"
+                            "when axes, radii and center are passed in __init__"
+                    )
         
         self.model = {
             'axes' : axes,
@@ -87,30 +98,21 @@ class Ellipsoid3D(AbstractSurfaceModel):
         radii = np.asarray(radii)
         center = np.asarray(center)
 
-        # (x - c).T @ Q @ (x - c) = 1
-        # Q = R @ S @ R.T
-        # R is rotation, which is the axes of the ellipsoid
         eigenvalue_matrix = np.diag(1/radii**2)
 
-        Q = axes @ eigenvalue_matrix @ axes.T
+        M = axes.T @ eigenvalue_matrix @ axes
+        k = (1 - center.T @ M @ center)
 
-        # x.T @ Q @ x - 2 x.T @ Q @ c + c.T @ Q @ c = 1
-        # x.T @ Q @ x - 2 x.T @ Q @ c = 1 - c.T @ Q @ c
-        # k = 1 - c.T @ Q @ c
-        # M = Q / k
-        # x.T @ M @ x - 2 x.T @ M = 1
-        M = Q / (1 - center.T @ Q @ center)
-
-        # get coeffs for x^2, xy etc. based on x.T @ M @ x
-        A = M[0, 0]
-        B = M[1, 1]
-        C = M[2, 2]
-        D = M[0, 1] * 2
-        E = M[0, 2] * 2
-        F = M[1, 2] * 2
+        Q = M / k
+        A = Q[0, 0]
+        B = Q[1, 1]
+        C = Q[2, 2]
+        D = Q[0, 1] * 2
+        E = Q[0, 2] * 2
+        F = Q[1, 2] * 2
 
         # get linear coeffs
-        b = (-2 * M @ center).squeeze()
+        b = (-2 * Q @ center).squeeze()
         G,H,I = b
 
         return A,B,C,D,E,F,G,H,I
@@ -118,20 +120,29 @@ class Ellipsoid3D(AbstractSurfaceModel):
     @staticmethod
     def polynomial_to_axes(polynomial):
         A,B,C,D,E,F,G,H,I = polynomial
+
         b = np.array([G,H,I])
 
-        M = np.array([
+        Q = np.array([
             [A, D/2, E/2],
             [D/2, B, F/2],
             [E/2, F/2, C]
         ])
-        center = np.linalg.solve(-2*M, b)
+        c = np.linalg.solve(-2*Q, b)
 
-        k = -1 + center @ M @ center + b @ center
+        k = 1/(1 + c.T @ Q @ c)
+        M = Q * k
         inv_rad, axes = np.linalg.eig(M)
-        inv_rad = -k / inv_rad
-        radii = np.sqrt(inv_rad)
-        return axes, radii, center
+        radii = np.sqrt(1/inv_rad)
+        axes = axes.T
+
+        return axes, radii, c
+
+    @staticmethod
+    def sort_axes_and_radii(axes, radii):
+        order = np.argsort(radii)
+        # return axes[:, order], radii[order]
+        return axes, radii
 
     def calc_distance_one_point(self, point: NDArray) -> float:
         return self.calc_distances(np.array([point]))[0]

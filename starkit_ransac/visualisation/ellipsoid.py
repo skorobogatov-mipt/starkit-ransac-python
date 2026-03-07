@@ -34,7 +34,7 @@ def generate_ellipsoid_mesh(
     lines = lines[:-resolution*2]
     points = np.array(points)
 
-    rotation = ellipsoid.model['axes']
+    rotation = ellipsoid.model['axes'].T
     points = points @ rotation.T
 
     points += ellipsoid.model['center']

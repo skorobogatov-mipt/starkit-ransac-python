@@ -10,7 +10,7 @@ def generate_ellipsoid(
 
     # an ellipsoid has three rotation angles
     axes = ellipsoid.model['axes']
-    rotation_matrix = axes
+    rotation_matrix = axes.T
 
     radii = ellipsoid.model['radii']
     center = ellipsoid.model['center']
