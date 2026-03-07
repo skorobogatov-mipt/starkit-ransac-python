@@ -1,7 +1,8 @@
 # finish ellipsoid3d
 
 write surfaces that are absent:
-* 7th march - write spheroid
+* 7th march - ~~write spheroid~~ spheroid is pointless and almost impossible
+* 7th march - box corner
 * 8th march - plane
 * 9th march - ellipse 2d
 * 10th march - cylinder
