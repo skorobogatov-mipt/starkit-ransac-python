@@ -1,6 +1,7 @@
 import pdb
 from typing import Iterable
 import numpy as np
+from numpy.linalg import LinAlgError
 from numpy.typing import NDArray
 from starkit_ransac.abstract_surface import AbstractSurfaceModel
 from starkit_ransac.utils import normalize
@@ -41,7 +42,7 @@ class Ellipsoid3D(AbstractSurfaceModel):
             polynomial = np.array(polynomial)
             if polynomial.shape != (9,):
                 raise ValueError("Polynomial must have 9 coefficients")
-
+    
         if axes is not None and\
            radii is not None and\
            center is not None:
@@ -86,7 +87,14 @@ class Ellipsoid3D(AbstractSurfaceModel):
         )
         self.model['polynomial'] = polynomial
 
-        axes, radii, center = self.polynomial_to_axes(polynomial)
+        try:
+            axes, radii, center = self.polynomial_to_axes(polynomial)
+        except LinAlgError as lae:
+            self.model['center'] = np.inf
+            self.model['axes'] = np.inf
+            self.model['radii'] = np.inf
+            return
+        axes, radii = self.sort_axes_and_radii(axes, radii)
 
         self.model['center'] = center
         self.model['axes'] = axes
@@ -115,7 +123,7 @@ class Ellipsoid3D(AbstractSurfaceModel):
         b = (-2 * Q @ center).squeeze()
         G,H,I = b
 
-        return A,B,C,D,E,F,G,H,I
+        return np.array([A,B,C,D,E,F,G,H,I])
 
     @staticmethod
     def polynomial_to_axes(polynomial):
@@ -132,6 +140,7 @@ class Ellipsoid3D(AbstractSurfaceModel):
 
         k = 1/(1 + c.T @ Q @ c)
         M = Q * k
+
         inv_rad, axes = np.linalg.eig(M)
         radii = np.sqrt(1/inv_rad)
         axes = axes.T
@@ -141,7 +150,7 @@ class Ellipsoid3D(AbstractSurfaceModel):
     @staticmethod
     def sort_axes_and_radii(axes, radii):
         order = np.argsort(radii)
-        # return axes[:, order], radii[order]
+        return axes[:, order], radii[order]
         return axes, radii
 
     def calc_distance_one_point(self, point: NDArray) -> float:
