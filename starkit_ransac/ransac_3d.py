@@ -1,14 +1,10 @@
 import pdb
 from starkit_ransac.generators.ellipsoid import generate_ellipsoid
 from time import sleep
-import open3d as o3d
 import numpy as np
 from numpy.typing import NDArray
 from starkit_ransac.abstract_surface import AbstractSurfaceModel
 from copy import deepcopy
-
-from starkit_ransac.visualisation.circle import generate_circle_mesh
-
 
 class RANSAC3D:
     """RANSAC algorithm implementation for 3D surface fitting.
@@ -101,12 +97,10 @@ class RANSAC3D:
             sample = self.__sample()
             self.model.fit_model(sample)
 
-
             distances = self.model.calc_distances(self.__data)
             score = self.__score_from_distances(distances)
             
             if score > best_model_score:
-
                 best_model = deepcopy(self.model)
                 best_model_score = score
         return best_model
