@@ -103,14 +103,14 @@ class TestEllipsoid3D:
         return 0.25
 
     def test_polynomial_are_close(self, fit_model, perfect_model, acceptable_polynomial_relative_error):
-        actual = perfect_model.model['polynomial']
-        fit = fit_model.model['polynomial']
+        actual = perfect_model.polynomial
+        fit = fit_model.polynomial
         diffs = np.abs((actual - fit))/actual
         assert (diffs < acceptable_polynomial_relative_error).all()
 
     def test_axes_are_close(self, fit_model, perfect_model, acceptable_axes_rmse):
-        actual = perfect_model.model['axes']
-        fit = fit_model.model['axes']
+        actual = perfect_model.axes
+        fit = fit_model.axes
         # axes can be in any order, so we have to find the minimal difference
         diffs = []
 
@@ -125,8 +125,8 @@ class TestEllipsoid3D:
         assert np.linalg.norm(diffs) < acceptable_axes_rmse
 
     def test_radii_are_close(self, fit_model, perfect_model, acceptable_radii_relative_error):
-        actual = perfect_model.model['radii']
-        fit = fit_model.model['radii']
+        actual = perfect_model.radii
+        fit = fit_model.radii
 
         # sort them because the order can be different
         fit = np.sort(fit)
@@ -141,8 +141,8 @@ class TestEllipsoid3D:
             perfect_model, 
             acceptable_center_distance
         ):
-        actual = perfect_model.model['center']
-        fit = fit_model.model['center']
+        actual = perfect_model.center
+        fit = fit_model.center
         diffs = actual - fit
         assert np.linalg.norm(diffs) < acceptable_center_distance
 
