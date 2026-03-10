@@ -22,7 +22,9 @@ class Line3D(AbstractSurfaceModel):
 
     def fit_model(self, points: NDArray):
         self.direction = normalize(points[1] - points[0])
-        self.point = points[0] + np.dot(points[0], self.direction) * self.direction
+        self.point = points[0] + \
+                np.dot(points[0], self.direction) * self.direction
+        return True
         
     def calc_distances(self, points: NDArray) -> NDArray:
         a = self.point

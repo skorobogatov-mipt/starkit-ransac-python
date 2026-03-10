@@ -89,6 +89,7 @@ class Circle(AbstractSurfaceModel):
         )[0]
 
         self.center = center
+        return True
 
     def calc_distances(self, points: NDArray) -> NDArray:
         # 1) get the circle's plane

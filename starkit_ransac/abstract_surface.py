@@ -58,7 +58,7 @@ class AbstractSurfaceModel(ABC):
     def fit_model(
             self,
             points: NDArray
-            ):
+            ) -> bool:
         """
             Fit the surface model to a set of points.
             

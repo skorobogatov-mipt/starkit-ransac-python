@@ -53,6 +53,7 @@ class Circle2D(AbstractSurfaceModel):
         
         self.center = center
         self.radius = radius
+        return True
 
     def calc_distances(self, points: NDArray) -> NDArray:
         return np.linalg.norm(points - self.center, axis=-1) - self.radius

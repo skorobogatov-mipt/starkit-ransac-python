@@ -11,11 +11,11 @@ def generate_ellipsoid(
     # FIXME this method generates point clouds with a bit of inconsistent
     # density
     # an ellipsoid has three rotation angles
-    axes = ellipsoid.model['axes']
+    axes = ellipsoid.axes
     rotation_matrix = axes.T
 
-    radii = ellipsoid.model['radii']
-    center = ellipsoid.model['center']
+    radii = ellipsoid.radii
+    center = ellipsoid.center
 
     # generate n random unit vectors
     points = np.random.random((n_points, 3)) - 0.5

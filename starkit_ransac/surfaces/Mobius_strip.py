@@ -70,9 +70,10 @@ class Mobius_strip(AbstractSurfaceModel):
         normal = np.cross(AB, AC)
         n_norm = np.linalg.norm(normal)
         if n_norm < 1e-12:
-            raise ValueError("The Mobius strip cannot be " \
-            "constructed from the given points, since a circle cannot " \
-            "be constructed from the first three of them.")
+            return False
+            # raise ValueError("The Mobius strip cannot be " \
+            # "constructed from the given points, since a circle cannot " \
+            # "be constructed from the first three of them.")
         normal = normal / n_norm
         if normal[2] < 0:
             normal = -normal
@@ -87,7 +88,8 @@ class Mobius_strip(AbstractSurfaceModel):
         wC = c * c * (a * a + b * b - c * c)
         denom = wA + wB + wC
         if abs(denom) < 1e-18:
-            raise ValueError("The Mobius strip cannot be constructed from the given points.")
+            return False
+            # raise ValueError("The Mobius strip cannot be constructed from the given points.")
         center = (wA * points[0] + wB * points[1] + wC * points[2]) / denom
 
         # --- проекция P на плоскость окружности ---
@@ -138,6 +140,7 @@ class Mobius_strip(AbstractSurfaceModel):
         self.orientation = orientation
         self.width = width
         self.start_vector = start_vector
+        return True
 
     def calc_distances(
             self,

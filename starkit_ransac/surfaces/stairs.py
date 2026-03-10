@@ -132,6 +132,7 @@ class StepPlane(AbstractSurfaceModel):
         self.model["step_width"] = float(step_width)
         self.model["step_height"] = float(step_height)
         self.model["rotation_deg"] = rotation_deg
+        return True
 
     def calc_distances(self, points: NDArray) -> NDArray:
         # Distance to nearest tread or riser surface.

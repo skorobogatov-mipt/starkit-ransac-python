@@ -42,6 +42,7 @@ class Sphere(AbstractSurfaceModel):
 
         self.center = np.array([a, b, c])
         self.radius = r
+        return True
 
     def calc_distances(self, points: ArrayLike) -> NDArray:
         return np.abs(np.linalg.norm(np.array(points) - self.center, axis=-1) - self.radius)

@@ -95,7 +95,9 @@ class RANSAC:
 
         for _ in range(iter_num):
             sample = self.__sample()
-            self.model.fit_model(sample)
+            success = self.model.fit_model(sample)
+            if not success:
+                continue
 
             distances = self.model.calc_distances(self.__data)
             score = self.__score_from_distances(distances)

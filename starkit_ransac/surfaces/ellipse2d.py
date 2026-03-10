@@ -71,13 +71,14 @@ class Ellipse2D(AbstractSurfaceModel):
             self.minor_radius = np.inf
             self.major_radius = np.inf
             self.center = np.full((2,), np.inf)
-            return
+            return False
 
         self.rotation,\
         self.major_radius,\
         self.minor_radius,\
         self.center = \
                 self.rotation_and_radii_from_polynomial(poly)
+        return True
 
 
     @staticmethod
