@@ -7,9 +7,9 @@ def generate_circle(
         noise_sigma:float=0.05,
         n_points=1000
     ):
-    center = circle.model['center']
-    normal = circle.model['normal']
-    radius = circle.model['radius']
+    center = circle.center
+    normal = circle.normal
+    radius = circle.radius
 
     # 1) generate a flat circle
     angles = np.linspace(-np.pi, np.pi, n_points)

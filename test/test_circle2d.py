@@ -82,8 +82,8 @@ class TestCircle2D:
         perfect_circle,
         acceptable_radius_error
     ):
-        fit_radius = fitted_circle.model['radius']
-        actual_radius = perfect_circle.model['radius']
+        fit_radius = fitted_circle.radius
+        actual_radius = perfect_circle.radius
         relative_radius_error = abs(fit_radius - actual_radius) / actual_radius
         assert relative_radius_error < acceptable_radius_error
 
@@ -93,7 +93,7 @@ class TestCircle2D:
         perfect_circle,
         acceptable_center_error
     ):
-        fit_center = fitted_circle.model['center']
-        actual_center = perfect_circle.model['center']
+        fit_center = fitted_circle.center
+        actual_center = perfect_circle.center
         dist = np.linalg.norm(fit_center - actual_center)
         assert dist < acceptable_center_error

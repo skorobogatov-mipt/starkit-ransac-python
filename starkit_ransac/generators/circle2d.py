@@ -6,8 +6,8 @@ def generate_circle2D(
         noise_sigma:float=0.05,
         n_points=1000
     ):
-    center = circle.model['center']
-    radius = circle.model['radius']
+    center = circle.center
+    radius = circle.radius
 
     angles = np.linspace(-np.pi, np.pi, n_points)
     points = np.vstack([
