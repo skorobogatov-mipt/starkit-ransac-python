@@ -27,6 +27,7 @@ def main():
 
     plt.scatter(data[:, 0], data[:, 1], c=(0.5, 0.5, 0.5))
     plt.plot(fit_data[:, 0], fit_data[:, 1], c=(0, 1, 0))
+    plt.gca().set_aspect('equal')
     plt.show()
 
 if __name__ == "__main__":

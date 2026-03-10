@@ -20,7 +20,7 @@ def generate_plane_mesh(
     distance = plane.calc_distance_one_point(approx_center)
     
     direction = np.sign(np.dot([a,b,c], approx_center) + d)
-    center = approx_center + direction * distance * normal
+    center = approx_center - direction * distance * normal
 
     # get some vector not parallel to a normal
     q1 = np.copy(normal)
@@ -43,6 +43,7 @@ def generate_plane_mesh(
     mesh = o3d.geometry.TriangleMesh()
     mesh.vertices = o3d.utility.Vector3dVector(points)
     mesh.triangles = o3d.utility.Vector3iVector(triangles)
+    
     mesh.compute_vertex_normals()
     mesh.paint_uniform_color(color)
 
