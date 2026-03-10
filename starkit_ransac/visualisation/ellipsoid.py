@@ -13,7 +13,7 @@ def generate_ellipsoid_mesh(
     thetas = np.linspace(-np.pi, np.pi, resolution)
     phis = np.linspace(-np.pi, np.pi, resolution)
 
-    radii = ellipsoid.model['radii']
+    radii = ellipsoid.radii
     a, b, c = radii
     points = []
     lines = []
@@ -34,10 +34,10 @@ def generate_ellipsoid_mesh(
     lines = lines[:-resolution*2]
     points = np.array(points)
 
-    rotation = ellipsoid.model['axes'].T
+    rotation = ellipsoid.axes.T
     points = points @ rotation.T
 
-    points += ellipsoid.model['center']
+    points += ellipsoid.center
 
     mesh = o3d.geometry.LineSet()
     mesh.points = o3d.utility.Vector3dVector(points)
