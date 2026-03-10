@@ -33,7 +33,6 @@ class Circle2D(AbstractSurfaceModel):
     def radius(self, radius:float):
         self._radius = float(radius)
 
-
     def fit_model(self, points: NDArray):
         # 1) get a central normal to the line between any two points
         mid1 = midpoint(points[0], points[1])
@@ -56,10 +55,10 @@ class Circle2D(AbstractSurfaceModel):
         return True
 
     def calc_distances(self, points: NDArray) -> NDArray:
-        return np.linalg.norm(points - self.center, axis=-1) - self.radius
+        return np.abs(np.linalg.norm(points - self.center, axis=-1) - self.radius)
 
     def calc_distance_one_point(self, point: NDArray) -> float:
-        return np.linalg.norm(point - self.center) - self.radius
+        return np.abs(np.linalg.norm(point - self.center) - self.radius)
 
     def __repr__(self):
         res = ''
