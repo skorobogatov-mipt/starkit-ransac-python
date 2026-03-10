@@ -5,6 +5,8 @@ description = "A library for RANSAC with most common objects"
 authors = [
     {
         name = "Skorobogatov Egor", email = "skorobogatov.ev@phystech.edu",
+        name = "Vakhnenko Robert", email = "vakhnenko.ri@phystech.edu",
+        name = "Grimaliuk Petr", email = "grimaliuk.pn@phystech.edu",
     }
 ]
 license = "MIT"
