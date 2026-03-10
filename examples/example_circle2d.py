@@ -1,5 +1,5 @@
-import open3d as o3d
 import numpy as np
+import matplotlib.pyplot as plt
 from starkit_ransac.generators.circle2d import generate_circle2D
 from starkit_ransac.surfaces.circle2d import Circle2D
 from starkit_ransac.ransac_3d import RANSAC
@@ -8,7 +8,7 @@ from starkit_ransac.visualisation.circle2d import generate_circle2D_mesh
 def main():
     ideal = Circle2D(
         center=(0.5, 0.1),
-        radius=1.7
+        radius=1.2
     )
     data = generate_circle2D(
             ideal,
@@ -19,18 +19,15 @@ def main():
     ransac.add_points(data)
     model = ransac.fit(
             Circle2D,
-            iter_num=500,
+            iter_num=1000,
             distance_threshold=0.05
     )
 
-    mesh = generate_circle2D_mesh(model)
+    fit_data = generate_circle2D(model, noise_sigma=0)
 
-    z = np.zeros(len(data)).reshape((len(data), 1))
-    data = np.hstack((data,z))
-    pcd = o3d.geometry.PointCloud()
-    pcd.points = o3d.utility.Vector3dVector(data)
-    o3d.visualization.draw_geometries([mesh, pcd])
-
+    plt.scatter(data[:, 0], data[:, 1], c=(0.5, 0.5, 0.5))
+    plt.plot(fit_data[:, 0], fit_data[:, 1], c=(0, 1, 0))
+    plt.show()
 
 if __name__ == "__main__":
     main()
