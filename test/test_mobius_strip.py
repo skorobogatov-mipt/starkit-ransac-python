@@ -37,15 +37,15 @@ def point_data():
     test_mobius.fit_model(test_info_points)
     
     test_noise_std = 0.5
-    test_box_center = test_mobius.model['center']
+    test_box_center = test_mobius.center
     test_box_size = 10
 
-    # width = test_mobius.model['width']
-    # center = test_mobius.model['center']
-    # normal = test_mobius.model['normal']
-    # radius = test_mobius.model['radius']
-    # start_vector = test_mobius.model['start_vector']
-    # orientation = test_mobius.model['orientation']
+    # width = test_mobius.width
+    # center = test_mobius.center
+    # normal = test_mobius.normal
+    # radius = test_mobius.radius
+    # start_vector = test_mobius.start_vector
+    # orientation = test_mobius.orientation
 
     # half_width = width/2
     # v1 = np.cross(normal, start_vector)
@@ -81,18 +81,17 @@ def test_mobius_strip(point_data, acceptable_rmse, test_generator_mobius_strip):
     runsuck = RANSAC()
     runsuck.add_points(point_data)
 
-    model = runsuck.fit(
+    result = runsuck.fit(
             Mobius_strip,
             N_ITERATIONS,
             0.5
     )
-    result = model.get_model()
-    result_center = result['center']
-    result_radius = result['radius']
-    result_width = result['width']
+    result_center = result.center
+    result_radius = result.radius
+    result_width = result.width
 
-    assert((np.sum((result_center - test_generator_mobius_strip.model['center'])**2) +
-            (result_radius - test_generator_mobius_strip.model['radius'])**2 +
-            (result_width - test_generator_mobius_strip.model['width'])**2)
+    assert((np.sum((result_center - test_generator_mobius_strip.center)**2) +
+            (result_radius - test_generator_mobius_strip.radius)**2 +
+            (result_width - test_generator_mobius_strip.width)**2)
             /5 <  acceptable_rmse)
 

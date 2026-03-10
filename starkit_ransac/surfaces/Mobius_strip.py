@@ -1,4 +1,5 @@
 import numpy as np
+from numpy.typing import ArrayLike
 from starkit_ransac.abstract_surface import AbstractSurfaceModel
 from numpy.typing import NDArray
 from copy import deepcopy
@@ -14,16 +15,48 @@ class Mobius_strip(AbstractSurfaceModel):
             start_vector=[np.nan, np.nan, np.nan]
         ) -> None:
         super().__init__()
-        self.model = {
-            "center": np.array(center).astype(np.float64),
-            "radius": radius,
-            "normal": np.array(normal).astype(np.float64),
+        self.center = np.array(center).astype(np.float64)
+        self.radius = radius
+        self.normal = np.array(normal).astype(np.float64)
 
-            "width": width,
-            "orientation": orientation,
-            "start_vector": np.array(start_vector).astype(np.float64)
-        }
+        self.width = width
+        self.orientation = orientation
+        self.start_vector = np.array(start_vector).astype(np.float64)
         self.num_samples = 4
+
+    @property
+    def center(self) -> NDArray[np.float64]:
+        return self._center
+
+    @center.setter
+    def center(self, center:ArrayLike):
+        self._center = np.copy(center)
+
+    @property
+    def radius(self) -> float:
+        return self._radius
+
+    @radius.setter
+    def radius(self, radius:float):
+        self._radius = float(radius)
+
+    @property
+    def start_vector(self) -> NDArray[np.float64]:
+        return self._start_vector
+
+    @start_vector.setter
+    def start_vector(self, start_vector:ArrayLike):
+        self._start_vector = np.array(start_vector, np.float64)
+
+    @property
+    def normal(self) -> NDArray[np.float64]:
+        return self._normal
+
+    @normal.setter
+    def normal(self, normal:ArrayLike):
+        if np.asarray(normal).flatten().shape != (3,):
+            raise ValueError("Normal must be a vector of 3 elements")
+        self._normal = np.asarray(normal) / np.linalg.norm(normal)
 
     def fit_model(
             self,
@@ -99,12 +132,12 @@ class Mobius_strip(AbstractSurfaceModel):
         # --- точка нулевой скрутки (сечение ленты лежит в плоскости окружности) ---
         start_vector = np.cos(circle_angle) * radial_dir - np.sin(circle_angle) * tangent_dir
 
-        self.model['center'] = center
-        self.model['radius'] = radius
-        self.model['normal'] = normal
-        self.model['orientation'] = orientation
-        self.model['width'] = width
-        self.model['start_vector'] = start_vector
+        self.center = center
+        self.radius = radius
+        self.normal = normal
+        self.orientation = orientation
+        self.width = width
+        self.start_vector = start_vector
 
     def calc_distances(
             self,
@@ -181,9 +214,9 @@ class Mobius_strip(AbstractSurfaceModel):
         return distance**0.5
 
     def get_points_coordinates_in_mobius(self, points):
-        relative_coordinates = points - self.model['center']
-        x_axis = self.model['start_vector']
-        z_axis = self.model['normal']
+        relative_coordinates = points - self.center
+        x_axis = self.start_vector
+        z_axis = self.normal
         y_axis = np.cross(z_axis, x_axis)
         y_axis = y_axis / np.linalg.norm(y_axis)
         rotation_matrix = np.stack([x_axis, y_axis, z_axis], axis=1)
@@ -193,9 +226,9 @@ class Mobius_strip(AbstractSurfaceModel):
         return transformed_points
 
     def get_point_coordinate_in_mobius(info, point):
-        relative_coordinates=point-self.model['center']
-        x_axis = self.model['start_vector'].copy()
-        z_axis = self.model['normal'].copy()
+        relative_coordinates=point-self.center
+        x_axis = self.start_vector.copy()
+        z_axis = self.normal.copy()
         y_axis = np.cross(z_axis, x_axis)
         y_axis = y_axis / np.linalg.norm(y_axis)
         transformed_point = np.array([
@@ -206,17 +239,18 @@ class Mobius_strip(AbstractSurfaceModel):
         return transformed_point
 
     def objective_function(self, theta_value, target_point):
-        if self.model['width'] == 0:
+        if self.width == 0:
             optimal_v = 0.0
         else:
             x = target_point[0]
             y = target_point[1]
             z = target_point[2]
-            optimal_v = np.clip(2*
-                                (-(radius - x *np.cos(theta_value) - y *np.sin(theta_value))*
-                                     np.cos(theta_value*self.model['orientation']/2) +
-                                     z*np.sin(theta_value*self.model['orientation']/2))
-                                     /self.model['width'], -1.0, 1.0)
+            optimal_v = np.clip(
+                2* (-(radius - x *np.cos(theta_value) - y *np.sin(theta_value))*
+                     np.cos(theta_value*self.orientation/2) +
+                     z*np.sin(theta_value*self.orientation/2))
+                     /self.width, 
+                -1.0, 1.0)
 
         a_vector = compute_a_vector(theta_value)
         b_vector = compute_b_vector(theta_value, target_point)
@@ -225,17 +259,17 @@ class Mobius_strip(AbstractSurfaceModel):
         return np.dot(residual, residual)
 
     def objective_function_array(self, theta_values, target_point):
-        if self.model['width'] == 0:
+        if self.width == 0:
             optimal_v = np.zeros_like(theta_values)
         else:
             x = target_point[0]
             y = target_point[1]
             z = target_point[2]
-            half_theta = theta_values * self.model['orientation'] / 2.0
+            half_theta = theta_values * self.orientation / 2.0
             optimal_v = np.clip(2*
                                 (-(radius - x *np.cos(theta_values) - y *np.sin(theta_values))*
                                  np.cos(half_theta) + z*np.sin(half_theta))
-                                 /self.model['width'], -1.0, 1.0)
+                                 /self.width, -1.0, 1.0)
     
         a_vectors = compute_a_vector_array(theta_values)
         b_vectors = compute_b_vector_array(theta_values, target_point)
@@ -246,7 +280,7 @@ class Mobius_strip(AbstractSurfaceModel):
     def objective_function_multi_target(self, theta_values, target_points):
         num_thetas = theta_values.shape[0]
         num_targets = target_points.shape[0]
-        if self.model['width'] == 0:
+        if self.width == 0:
             optimal_v = np.zeros((num_targets, num_thetas))
         else:
             x_coords = target_points[:, 0][:, None]
@@ -254,18 +288,18 @@ class Mobius_strip(AbstractSurfaceModel):
             z_coords = target_points[:, 2][:, None]
     
             theta_row = theta_values[None, :] 
-            half_theta = theta_row * self.model['orientation'] / 2.0
+            half_theta = theta_row * self.orientation / 2.0
             optimal_v_unclipped = (
                 2.0
                 * (
                     z_coords * np.sin(half_theta)
                     - np.cos(half_theta)
                     * (
-                        self.model['radius']
+                        self.radius
                         - x_coords * np.cos(theta_row)
                         - y_coords * np.sin(theta_row)
                     )
-                )/self.model['width']
+                )/self.width
             )
             optimal_v = np.clip(optimal_v_unclipped, -1.0, 1.0)
     
@@ -283,8 +317,8 @@ class Mobius_strip(AbstractSurfaceModel):
     def compute_a_vector_array(self, theta_values):
         # helper function for calculating distance
 
-        half_theta = theta_values * self.model['orientation'] / 2.0
-        scale = self.model['width'] / 2.0
+        half_theta = theta_values * self.orientation / 2.0
+        scale = self.width / 2.0
     
         return scale * np.column_stack(
             [
@@ -303,8 +337,8 @@ class Mobius_strip(AbstractSurfaceModel):
     
         return np.stack(
             [
-                self.model['radius'] * np.cos(theta_row) - x_coords,
-                self.model['radius'] * np.sin(theta_row) - y_coords,
+                self.radius * np.cos(theta_row) - x_coords,
+                self.radius * np.sin(theta_row) - y_coords,
                 -z_coords * np.ones_like(theta_row),
             ],
             axis=2
@@ -319,22 +353,22 @@ class Mobius_strip(AbstractSurfaceModel):
     
         return np.column_stack(
             [
-                self.model['radius'] * np.cos(theta_values) - x_coord,
-                self.model['radius'] * np.sin(theta_values) - y_coord,
+                self.radius * np.cos(theta_values) - x_coord,
+                self.radius * np.sin(theta_values) - y_coord,
                 -z_coord * np.ones_like(theta_values),
             ]
         )
 
     def compute_b_vector(self, theta_value, target_point):
         return np.array([
-            self.model['radius'] * np.cos(theta_value) - target_point[0],
-            self.model['radius'] * np.sin(theta_value) - target_point[1],
+            self.radius * np.cos(theta_value) - target_point[0],
+            self.radius * np.sin(theta_value) - target_point[1],
             -target_point[2]
         ])
 
     def compute_a_vector(self, theta_value):
-        half_theta = theta_value * 0.5 * self.model['orientation']
-        coefficient = self.model['width'] * 0.5
+        half_theta = theta_value * 0.5 * self.orientation
+        coefficient = self.width * 0.5
     
         return np.array([
             coefficient * np.cos(theta_value) * np.cos(half_theta),

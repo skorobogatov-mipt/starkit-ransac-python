@@ -7,12 +7,12 @@ def generate_mobius_mesh(
         n_theta=1000, 
         n_width=100,
     ):
-    half_width = mobius_strip.model['width']/2
-    center = mobius_strip.model['center']
-    normal = mobius_strip.model['normal']
-    radius = mobius_strip.model['radius']
-    orientation = mobius_strip.model['orientation']
-    zero_angle_vector = mobius_strip.model['start_vector']
+    half_width = mobius_strip.width/2
+    center = mobius_strip.center
+    normal = mobius_strip.normal
+    radius = mobius_strip.radius
+    orientation = mobius_strip.orientation
+    zero_angle_vector = mobius_strip.start_vector
     v1 = np.cross(normal, zero_angle_vector)
     v1 /= np.linalg.norm(v1)
     angles = np.linspace(0, 2*np.pi, n_theta, endpoint=False)

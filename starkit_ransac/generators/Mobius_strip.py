@@ -8,12 +8,12 @@ def generate_mobius(
         box_center=np.array([0, 0, 0]), 
         box_size=np.array([10, 10, 10])
     ):
-    half_width = mobius_strip.model['width']/2
-    center = mobius_strip.model['center']
-    normal = mobius_strip.model['normal']
-    radius = mobius_strip.model['radius']
-    zero_angle_vector = mobius_strip.model['start_vector']
-    orientation = mobius_strip.model['orientation']
+    half_width = mobius_strip.width/2
+    center = mobius_strip.center
+    normal = mobius_strip.normal
+    radius = mobius_strip.radius
+    zero_angle_vector = mobius_strip.start_vector
+    orientation = mobius_strip.orientation
 
     v1 = np.cross(normal, zero_angle_vector)
     v1 /= np.linalg.norm(v1)
