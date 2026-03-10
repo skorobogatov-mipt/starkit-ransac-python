@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 from starkit_ransac.generators.circle2d import generate_circle2D
 from starkit_ransac.surfaces.circle2d import Circle2D
-from starkit_ransac.ransac_3d import RANSAC3D
+from starkit_ransac.ransac_3d import RANSAC
 from conftest import SEED
 
 
@@ -58,7 +58,7 @@ class TestCircle2D:
 
     @pytest.fixture(scope="class")
     def fitted_circle(self, circle_data):
-        ransac = RANSAC3D()
+        ransac = RANSAC()
         ransac.add_points(circle_data)
 
         model = ransac.fit(

@@ -1,5 +1,5 @@
 import pytest
-from starkit_ransac.ransac_3d import RANSAC3D
+from starkit_ransac.ransac_3d import RANSAC
 from starkit_ransac.surfaces.ELLIPSOID_NEW import EllipsoidModel
 import numpy as np
 
@@ -97,7 +97,7 @@ def test_ellipsoid_fitting(ellipsoid_test_data, acceptable_center_error,
     n_inliers_true = ellipsoid_test_data['n_inliers']
 
     # Инициализация RANSAC
-    ransac = RANSAC3D()
+    ransac = RANSAC()
     ransac.add_points(data)
 
     # Подгонка модели эллипсоида
@@ -180,7 +180,7 @@ def test_ellipsoid_perfect_sphere():
     data = np.array(points)
 
     # Подгонка модели
-    ransac = RANSAC3D()
+    ransac = RANSAC()
     ransac.add_points(data)
 
     # Пробуем разные параметры RANSAC
@@ -240,7 +240,7 @@ def test_ellipsoid_ransac_integration():
     ])
 
     # Инициализация RANSAC
-    ransac = RANSAC3D()
+    ransac = RANSAC()
     ransac.add_points(points)
 
     # Пытаемся подогнать модель с минимальными требованиями
@@ -278,7 +278,7 @@ def test_ellipsoid_ransac_integration():
 
     many_points = np.array(many_points)
 
-    ransac2 = RANSAC3D()
+    ransac2 = RANSAC()
     ransac2.add_points(many_points)
 
     try:
@@ -296,7 +296,7 @@ def test_ellipsoid_ransac_integration():
 
 def test_ellipsoid_invalid_input():
     """5. Тест обработки некорректных входных данных."""
-    ransac = RANSAC3D()
+    ransac = RANSAC()
 
     # Пустой набор точек
     with pytest.raises(Exception):

@@ -1,5 +1,5 @@
 import open3d as o3d
-from starkit_ransac.ransac_3d import RANSAC3D
+from starkit_ransac.ransac_3d import RANSAC
 from starkit_ransac.surfaces.Mobius_strip import Mobius_strip
 from starkit_ransac.generators.Mobius_strip import generate_mobius
 from starkit_ransac.visualisation.Mobius_strip import generate_mobius_mesh
@@ -18,7 +18,7 @@ def main():
         n_points=1000,
         noise_sigma=0
     )
-    ransac = RANSAC3D()
+    ransac = RANSAC()
     ransac.add_points(data)
     fitted = ransac.fit(
         Mobius_strip,

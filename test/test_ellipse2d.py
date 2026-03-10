@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 
-from starkit_ransac.ransac_3d import RANSAC3D
+from starkit_ransac.ransac_3d import RANSAC
 from starkit_ransac.surfaces.ellipse2d import Ellipse2D
 from starkit_ransac.generators.ellipse2d import generate_ellipse2d
 from conftest import RNG
@@ -64,7 +64,7 @@ class TestEllipse2D:
 
     @pytest.fixture(scope="class")
     def fit_model(self, data_points):
-        ransac = RANSAC3D(data_points)
+        ransac = RANSAC(data_points)
         model = ransac.fit(Ellipse2D, 5000, 0.05)
         return model
 

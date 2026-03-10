@@ -6,7 +6,7 @@ from numpy.typing import NDArray
 from starkit_ransac.abstract_surface import AbstractSurfaceModel
 from copy import deepcopy
 
-class RANSAC3D:
+class RANSAC:
     """RANSAC algorithm implementation for 3D surface fitting.
     
     This class implements the Random Sample Consensus (RANSAC) algorithm

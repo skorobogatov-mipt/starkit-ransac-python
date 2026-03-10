@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 from starkit_ransac.surfaces.sphere import Sphere
-from starkit_ransac.ransac_3d import RANSAC3D
+from starkit_ransac.ransac_3d import RANSAC
 from conftest import RNG
 from starkit_ransac.generators.sphere import generate_sphere
 
@@ -61,7 +61,7 @@ class TestSphere:
 
     @pytest.fixture(scope='class')
     def fit_model(self, data_points):
-        ransac = RANSAC3D(data_points)
+        ransac = RANSAC(data_points)
         model = ransac.fit(
             Sphere,
             5000,

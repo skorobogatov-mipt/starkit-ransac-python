@@ -1,5 +1,5 @@
 import open3d as o3d
-from starkit_ransac.ransac_3d import RANSAC3D
+from starkit_ransac.ransac_3d import RANSAC
 from starkit_ransac.surfaces.line3d import Line3D
 from starkit_ransac.generators.line3d import generate_line3d
 from starkit_ransac.visualisation.line3d import generate_line3d_mesh
@@ -10,7 +10,7 @@ def main():
         point=[1, 0, -2.4]
     )
     data = generate_line3d(perfect_line)
-    ransac = RANSAC3D(data)
+    ransac = RANSAC(data)
     model = ransac.fit(
             object_type=Line3D,
             iter_num=100,

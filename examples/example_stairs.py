@@ -3,7 +3,7 @@ import numpy as np
 import open3d as o3d
 import math
 
-from starkit_ransac.ransac_3d import RANSAC3D
+from starkit_ransac.ransac_3d import RANSAC
 from starkit_ransac.surfaces.stairs import StepPlane
 from starkit_ransac.generators.generators import generate_stairs
 from starkit_ransac.visualisation.stairs import generate_stairs_mesh, visualize_stairs
@@ -28,7 +28,7 @@ def main():
         rotation_deg=30,
         noise_sigma=0.05
     )
-    ransac = RANSAC3D()
+    ransac = RANSAC()
     ransac.add_points(data)
     model = ransac.fit(
             StepPlane,

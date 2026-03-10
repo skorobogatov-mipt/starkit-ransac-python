@@ -1,6 +1,6 @@
 import pytest
 
-from starkit_ransac.ransac_3d import RANSAC3D
+from starkit_ransac.ransac_3d import RANSAC
 from starkit_ransac.surfaces.plane import Plane3D
 import numpy as np
 
@@ -36,7 +36,7 @@ def acceptable_rmse():
     return 0.2
     
 def test_plane(plane_data, acceptable_rmse):
-    runsuck = RANSAC3D()
+    runsuck = RANSAC()
     runsuck.add_points(plane_data)
 
     model = runsuck.fit(

@@ -1,6 +1,6 @@
 import numpy as np
 from starkit_ransac.surfaces.point import Point3D
-from starkit_ransac.ransac_3d import RANSAC3D
+from starkit_ransac.ransac_3d import RANSAC
 
 SEED = 42
 np.random.seed(SEED)
@@ -16,7 +16,7 @@ def main():
     # generate synthetic data
     data = generate_data(np.zeros(3))
 
-    ransac = RANSAC3D()
+    ransac = RANSAC()
     ransac.add_points(data)
     fitted_model = ransac.fit(Point3D, 1000, 0.5)
     print(fitted_model)

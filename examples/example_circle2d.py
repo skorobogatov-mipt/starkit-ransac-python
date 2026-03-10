@@ -2,7 +2,7 @@ import open3d as o3d
 import numpy as np
 from starkit_ransac.generators.circle2d import generate_circle2D
 from starkit_ransac.surfaces.circle2d import Circle2D
-from starkit_ransac.ransac_3d import RANSAC3D
+from starkit_ransac.ransac_3d import RANSAC
 from starkit_ransac.visualisation.circle2d import generate_circle2D_mesh
 
 def main():
@@ -15,7 +15,7 @@ def main():
             noise_sigma=0.1
     )
 
-    ransac = RANSAC3D()
+    ransac = RANSAC()
     ransac.add_points(data)
     model = ransac.fit(
             Circle2D,

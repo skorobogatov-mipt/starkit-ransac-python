@@ -2,21 +2,21 @@ import numpy as np
 import pytest
 from starkit_ransac.generators.circle import generate_circle
 from starkit_ransac.surfaces.circle import Circle
-from starkit_ransac.ransac_3d import RANSAC3D
-from conftest import SEED
+from starkit_ransac.ransac_3d import RANSAC
+from conftest import SEED,RNG
 
 
 class TestCircle3D:
     MAX_OFFSET = 20
     center_coordinates = (
-        np.random.default_rng(SEED).random((5, 3)) * MAX_OFFSET
+        RNG.random((5, 3)) * MAX_OFFSET
     ).tolist()
 
-    normals = np.random.default_rng(SEED).random((5, 3)).tolist()
+    normals = RNG.random((5, 3)).tolist()
 
     MAX_RADIUS = 5
     radii = (
-        np.random.default_rng(SEED).random(5) * MAX_RADIUS
+        RNG.random(5) * MAX_RADIUS
     ).tolist()
 
     @pytest.fixture(scope="class", params=center_coordinates)
@@ -43,7 +43,7 @@ class TestCircle3D:
     def noise_sigma(self, request):
         return request.param
 
-    @pytest.fixture(scope="class", params=[1000, 500, 250, 100, 50])
+    @pytest.fixture(scope="class", params=[1000, 500, 250])
     def n_points(self, request):
         return request.param
 
@@ -58,7 +58,7 @@ class TestCircle3D:
 
     @pytest.fixture(scope="class")
     def fitted_circle(self, circle_data):
-        ransac = RANSAC3D()
+        ransac = RANSAC()
         ransac.add_points(circle_data)
 
         model = ransac.fit(

@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from starkit_ransac.ransac_3d import RANSAC3D
+from starkit_ransac.ransac_3d import RANSAC
 from starkit_ransac.surfaces.cylindrical_ring import CylindricalRing
 import math
 
@@ -126,7 +126,7 @@ def cylindrical_ring_data():
 
 def test_cylindrical_ring_center(cylindrical_ring_data):
 
-    ransac = RANSAC3D()
+    ransac = RANSAC()
     ransac.add_points(cylindrical_ring_data)
 
     model = ransac.fit(

@@ -1,6 +1,6 @@
 import pytest
 
-from starkit_ransac.ransac_3d import RANSAC3D
+from starkit_ransac.ransac_3d import RANSAC
 from starkit_ransac.surfaces.ellipsoid import Ellipsoid3D
 from starkit_ransac.generators.ellipsoid import generate_ellipsoid
 import numpy as np
@@ -77,7 +77,7 @@ class TestEllipsoid3D:
 
     @pytest.fixture(scope='class')
     def fit_model(self, data_points):
-        rasnsac = RANSAC3D(data_points)
+        rasnsac = RANSAC(data_points)
         model = rasnsac.fit(
             Ellipsoid3D,
             10000,

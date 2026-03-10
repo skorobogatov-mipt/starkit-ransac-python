@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 from starkit_ransac.generators.generators import generate_cylindrical_ring
 from starkit_ransac.visualisation.cylindircal_ring import visualize_ring
-from starkit_ransac.ransac_3d import RANSAC3D
+from starkit_ransac.ransac_3d import RANSAC
 from starkit_ransac.surfaces.cylindrical_ring import CylindricalRing
 
 def main():
@@ -14,7 +14,7 @@ def main():
         center=(0.42, -0.3, 7),
         n_points=1000
     )
-    ransac = RANSAC3D()
+    ransac = RANSAC()
     ransac.add_points(data)
     model = ransac.fit(
         CylindricalRing,

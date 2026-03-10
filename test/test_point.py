@@ -1,6 +1,6 @@
 import pytest
 
-from starkit_ransac.ransac_3d import RANSAC3D
+from starkit_ransac.ransac_3d import RANSAC
 from starkit_ransac.surfaces.point import Point3D
 import numpy as np
 
@@ -17,7 +17,7 @@ def acceptable_rmse():
     return 0.2
     
 def test_point(point_data, acceptable_rmse):
-    runsuck = RANSAC3D()
+    runsuck = RANSAC()
     runsuck.add_points(point_data)
 
     model = runsuck.fit(

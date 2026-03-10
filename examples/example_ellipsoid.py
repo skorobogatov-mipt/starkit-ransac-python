@@ -3,7 +3,7 @@ import numpy as np
 
 from starkit_ransac.generators import ellipsoid
 from starkit_ransac.generators.ellipsoid import generate_ellipsoid, generate_ellipsoid_poly
-from starkit_ransac.ransac_3d import RANSAC3D
+from starkit_ransac.ransac_3d import RANSAC
 from starkit_ransac.surfaces.ellipsoid import Ellipsoid3D
 from starkit_ransac.visualisation.ellipsoid import generate_ellipsoid_mesh
 
@@ -26,7 +26,7 @@ def main():
             n_points=500,
             noise_sigma=0.05
     )
-    ransac = RANSAC3D(data)
+    ransac = RANSAC(data)
     model:Ellipsoid3D = ransac.fit(
         Ellipsoid3D,
         5000,

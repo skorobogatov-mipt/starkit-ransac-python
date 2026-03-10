@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from starkit_ransac.surfaces.ellipse2d import Ellipse2D
-from starkit_ransac.ransac_3d import RANSAC3D
+from starkit_ransac.ransac_3d import RANSAC
 from starkit_ransac.generators.ellipse2d import generate_ellipse2d
 
 def main():
@@ -13,7 +13,7 @@ def main():
     )
     data = generate_ellipse2d(perfect_ellipse)
 
-    ransac = RANSAC3D(data)
+    ransac = RANSAC(data)
     fit_ellipse = ransac.fit(
             Ellipse2D,
             500,

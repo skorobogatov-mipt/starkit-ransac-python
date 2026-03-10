@@ -1,6 +1,6 @@
 import pytest
 
-from starkit_ransac.ransac_3d import RANSAC3D
+from starkit_ransac.ransac_3d import RANSAC
 from starkit_ransac.surfaces.Mobius_strip import Mobius_strip
 from starkit_ransac.generators.Mobius_strip import generate_mobius
 import numpy as np
@@ -78,7 +78,7 @@ def acceptable_rmse():
     return 2
     
 def test_mobius_strip(point_data, acceptable_rmse, test_generator_mobius_strip):
-    runsuck = RANSAC3D()
+    runsuck = RANSAC()
     runsuck.add_points(point_data)
 
     model = runsuck.fit(

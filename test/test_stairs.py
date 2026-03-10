@@ -1,6 +1,6 @@
 import pytest
 
-from starkit_ransac.ransac_3d import RANSAC3D
+from starkit_ransac.ransac_3d import RANSAC
 from starkit_ransac.surfaces.stairs import StepPlane
 import numpy as np
 
@@ -40,7 +40,7 @@ def test_stairs(
         acceptable_rmse,
     ):
     # Fitting model stairs RANSAC
-    runsuck = RANSAC3D()
+    runsuck = RANSAC()
     runsuck.add_points(stairs_data)
 
     np.random.seed(SEED)

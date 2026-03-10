@@ -1,5 +1,5 @@
 import open3d as o3d
-from starkit_ransac.ransac_3d import RANSAC3D
+from starkit_ransac.ransac_3d import RANSAC
 from starkit_ransac.surfaces.sphere import Sphere
 from starkit_ransac.generators.sphere import generate_sphere
 from starkit_ransac.visualisation.sphere import generate_sphere_mesh
@@ -14,7 +14,7 @@ def main():
             noise_sigma=0.1,
             n_points=1000
     )
-    ransac = RANSAC3D(data)
+    ransac = RANSAC(data)
     model = ransac.fit(Sphere, 10, 0.05)
 
     print(perfect_sphere.radius)

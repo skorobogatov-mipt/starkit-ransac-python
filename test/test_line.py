@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from starkit_ransac.ransac_3d import RANSAC3D
+from starkit_ransac.ransac_3d import RANSAC
 from starkit_ransac.surfaces.line3d import Line3D
 from starkit_ransac.generators.line3d import generate_line3d
 from conftest import RNG
@@ -52,7 +52,7 @@ class TestLine3D:
 
     @pytest.fixture(scope='class')
     def fit_model(self, data_points):
-        ransac = RANSAC3D(data_points)
+        ransac = RANSAC(data_points)
         model = ransac.fit(
             Line3D,
             iter_num=1000,
