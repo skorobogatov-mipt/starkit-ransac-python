@@ -70,7 +70,7 @@ class Ellipse2D(AbstractSurfaceModel):
             self.rotation = np.inf
             self.minor_radius = np.inf
             self.major_radius = np.inf
-            self.center = np.full((3,), np.inf)
+            self.center = np.full((2,), np.inf)
             return
 
         self.rotation,\

@@ -4,9 +4,9 @@ from starkit_ransac.surfaces.ellipse2d import Ellipse2D
 def generate_ellipse2d(
         ellipse:Ellipse2D,
         noise_sigma=0.05,
-        n_poins=1000
+        n_points=1000
     ):
-    thetas = np.linspace(-np.pi, np.pi, n_poins)
+    thetas = np.linspace(-np.pi, np.pi, n_points)
     a = ellipse.major_radius
     b = ellipse.minor_radius
     points = np.array([
