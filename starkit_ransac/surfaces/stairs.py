@@ -128,19 +128,19 @@ class StepPlane(AbstractSurfaceModel):
 
         stair_height = float(np.max(z_local) - np.min(z_local))
 
-        self.model["stair_height"] = stair_height
-        self.model["step_width"] = float(step_width)
-        self.model["step_height"] = float(step_height)
-        self.model["rotation_deg"] = rotation_deg
+        self.stair_height = stair_height
+        self.step_width = float(step_width)
+        self.step_height = float(step_height)
+        self.rotation_deg = rotation_deg
         return True
 
     def calc_distances(self, points: NDArray) -> NDArray:
         # Distance to nearest tread or riser surface.
         points = np.asarray(points, dtype=float)
 
-        step_width = self.model["step_width"]
-        step_height = self.model["step_height"]
-        rotation_deg = self.model["rotation_deg"]
+        step_width = self.step_width
+        step_height = self.step_height
+        rotation_deg = self.rotation_deg
 
         theta = -np.deg2rad(rotation_deg)
         rot2 = np.array(

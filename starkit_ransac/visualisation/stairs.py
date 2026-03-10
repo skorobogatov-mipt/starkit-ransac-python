@@ -3,23 +3,24 @@ import numpy as np
 from starkit_ransac.surfaces.stairs import StepPlane
 
 def generate_stairs_mesh(stairs:StepPlane):
-    model = stairs.get_model()
     planes = []
     thickness = 0.01
 
-    num_steps = int(np.ceil(model['stair_height'] / model['step_height']))
+    num_steps = int(np.ceil(stairs.stair_height / stairs.step_height))
     for i in range(num_steps):
     # --- 1. ГОРИЗОНТАЛЬНАЯ СТУПЕНЬ ---
     # Размеры: x=глубина шага, y=ширина марша, z=толщина
         step = o3d.geometry.TriangleMesh.create_box(
-            width=model['step_width'], 
-            height=model['stair_height'], 
+            width=stairs.step_width, 
+            height=stairs.stair_height, 
             depth=thickness
         )
         # Сдвигаем: x вперед, z вверх (на i-й уровень)
-        step.translate([i * model['step_width'], 0, i * model['step_height']])
+        step.translate([i * stairs.step_width, 0, i * stairs.step_height])
         step.paint_uniform_color([0.0, 1.0, 0.0]) # Светло-серый
-        R = step.get_rotation_matrix_from_xyz((0, 0, np.deg2rad(model['rotation_deg'])))
+        R = step.get_rotation_matrix_from_xyz(
+                (0, 0, np.deg2rad(stairs.rotation_deg))
+        )
         step.rotate(R, center=(0, 0, 0))
         planes.append(step)
 
@@ -28,8 +29,8 @@ def generate_stairs_mesh(stairs:StepPlane):
         # Размеры: x=толщина, y=ширина марша, z=высота шага
         riser = o3d.geometry.TriangleMesh.create_box(
             width=thickness, 
-            height=model['stair_height'], 
-            depth=model['step_height']
+            height=stairs.stair_height, 
+            depth=stairs.step_height
         )
         
         if(i == num_steps - 1): 
@@ -37,11 +38,17 @@ def generate_stairs_mesh(stairs:StepPlane):
 
         # Сдвигаем: ставим его ПЕРЕД ступенью
         # x - в начало текущей ступени, z - под текущую ступень
-        riser.translate([(i + 1) * model['step_width'], 0, (i) * model['step_height']])
+        riser.translate([
+            (i + 1) * stairs.step_width, 
+            0, 
+            (i) * stairs.step_height
+        ])
         
         # Чтобы закрыть самый первый шаг (от пола), добавим условие или просто рисуем всегда
         riser.paint_uniform_color([0.0, 1.0, 0.0]) # Темно-серый
-        R = riser.get_rotation_matrix_from_xyz((0, 0, np.deg2rad(model['rotation_deg'])))
+        R = riser.get_rotation_matrix_from_xyz(
+                (0, 0, np.deg2rad(stairs.rotation_deg))
+        )
         riser.rotate(R, center=(0, 0, 0))
         planes.append(riser)
 
