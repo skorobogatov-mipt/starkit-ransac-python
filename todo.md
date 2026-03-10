@@ -4,7 +4,7 @@ write surfaces that are absent:
 * 7th march - ~~write spheroid~~ spheroid is pointless and almost impossible
 * 7th march - box corner -- no way i'm doing it now. i did a line
 * 8th march - ~~plane~~ -- sphere would be more important, plane is fine
-* 8th march -- happy birthday! now write a sphere
+* 8th march -- happy birthday! now write a sphere -- done
 * 9th march - ellipse 2d
 * 10th march - cylinder
 
