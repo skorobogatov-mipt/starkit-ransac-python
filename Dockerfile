@@ -14,10 +14,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxinerama1 \
     libxrandr2 \
     libxi6 \
+    python3-pyqt5 \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Open3D
-RUN pip install --upgrade pip setuptools "numpy<2,>=1.23.5"
+RUN pip install --upgrade pip setuptools "numpy<2,>=1.23.5" pyqt5
 RUN pip3 install --no-cache-dir open3d pytest
 
 WORKDIR /root/starkit-ransac
