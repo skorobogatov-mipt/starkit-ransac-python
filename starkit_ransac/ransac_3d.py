@@ -125,8 +125,7 @@ class RANSAC:
                 The number of points within the distance threshold (inlier count).
         """
 
-        scores = (distances <= self.__distance_threshold)
-        return np.sum(scores)
+        return np.sum(distances <= self.__distance_threshold)
 
     def __sample(
             self
@@ -147,3 +146,4 @@ class RANSAC:
                 replace=False
         )
         return self.__data[indices]
+
