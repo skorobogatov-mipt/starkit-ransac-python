@@ -6,7 +6,7 @@ from starkit_ransac.abstract_surface import AbstractSurfaceModel
 from starkit_ransac.utils import line_from_2_points, lines_intersection, midpoint, normal_to_2d_line, rotate_from_axis_to_axis, rotate_rodrigues
 from starkit_ransac.surfaces.circle2d import Circle2D
 
-class Circle(AbstractSurfaceModel):
+class Circle3D(AbstractSurfaceModel):
     def __init__(
             self,
             center:ArrayLike|None=None,
