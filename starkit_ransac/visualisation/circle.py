@@ -1,10 +1,10 @@
 import open3d as o3d
 import numpy as np
-from starkit_ransac.surfaces.circle import Circle
+from starkit_ransac.surfaces.circle import Circle3D
 from starkit_ransac.generators.circle import generate_circle
 
 def generate_circle_mesh(
-        circle:Circle,
+        circle:Circle3D,
         color=np.array([0, 1, 0]),
         resolution=100
     ):

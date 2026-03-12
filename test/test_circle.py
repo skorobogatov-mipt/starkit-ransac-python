@@ -1,10 +1,11 @@
+import pyransac3d
 import numpy as np
 import pytest
 from starkit_ransac.generators.circle import generate_circle
-from starkit_ransac.surfaces.circle import Circle
+from starkit_ransac.surfaces.circle import Circle3D
 from starkit_ransac.ransac_3d import RANSAC
 from conftest import SEED,RNG
-
+from pytest_benchmark.plugin import benchmark
 
 class TestCircle3D:
     MAX_OFFSET = 20
@@ -33,7 +34,7 @@ class TestCircle3D:
 
     @pytest.fixture(scope="class")
     def perfect_circle(self, center, radius, normal):
-        return Circle(
+        return Circle3D(
             center=center,
             radius=radius,
             normal=normal
@@ -62,7 +63,7 @@ class TestCircle3D:
         ransac.add_points(circle_data)
 
         model = ransac.fit(
-            Circle,
+            Circle3D,
             500,
             0.1
         )
@@ -113,3 +114,22 @@ class TestCircle3D:
         actual_center = perfect_circle.center
         dist = np.linalg.norm(fit_center - actual_center)
         assert dist < acceptable_center_error
+
+    def test_benchmark_starkit_ransac(self, circle_data, benchmark):
+        ransac = RANSAC(circle_data)
+        benchmark(
+            ransac.fit,
+            Circle3D,
+            500,
+            0.1
+        )
+
+    def test_benchmark_pyransac(self, circle_data, benchmark):
+        circle = pyransac3d.circle.Circle()
+        benchmark(
+            circle.fit,
+            circle_data,
+            0.1,
+            500,
+        )
+

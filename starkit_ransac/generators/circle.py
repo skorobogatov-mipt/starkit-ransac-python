@@ -1,9 +1,9 @@
 import numpy as np
-from starkit_ransac.surfaces.circle import Circle
+from starkit_ransac.surfaces.circle import Circle3D
 from starkit_ransac.utils import rotate_from_axis_to_axis
 
 def generate_circle(
-        circle:Circle, 
+        circle:Circle3D, 
         noise_sigma:float=0.05,
         n_points=1000
     ):
