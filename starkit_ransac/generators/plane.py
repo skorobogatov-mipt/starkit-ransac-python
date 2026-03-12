@@ -23,8 +23,8 @@ def generate_plane(
     center = approx_center - direction * distance * normal
 
     # get some vector not parallel to a normal
-    q1 = np.copy(normal)
-    q1[:] = q1[::-1] # just reverse the normal
+    q1 = normal + np.random.random(3)
+    q1[:] = q1[::-1]
 
     # get two orthogonal vectors that lie in the plane
     v1 = np.cross(normal, q1)

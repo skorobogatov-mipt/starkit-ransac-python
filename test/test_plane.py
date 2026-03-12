@@ -1,62 +1,150 @@
 import pytest
-
+import numpy as np
 from starkit_ransac.ransac_3d import RANSAC
 from starkit_ransac.surfaces.plane import Plane3D
-import numpy as np
+from starkit_ransac.generators.plane import generate_plane
+from conftest import RNG
 
-N_POINTS = 100
-SEED = 42
+from pytest_benchmark.plugin import benchmark
+import pyransac3d
 
-@pytest.fixture
-def plane_data():
-    np.random.seed(SEED)
+class TestPlane3D:
+    approx_center_list = [
+        [10, 54.2, 100],
+        [0, 0, 0],
+        [-4.2, 5.76, -1.228]
+    ]
+    coeffs_list = [
+        [1, 1, 1, 0],
+        [0, 2, 5, 10],
+        [-345, 0, 1235, 23.1],
+        [-0.054, 123, 0, 482.5748],
+        [-0.8, 0.9, 3.57, 5.423]
+    ]
 
-    a, b, c = np.array((0,0,1), dtype=float)
-    norm = np.sqrt(a**2 + b**2 + c**2)
-    a, b, c = a/norm, b/norm, c/norm
-    print(a,b,c)
-    
-    x = np.random.uniform(-10, 10, N_POINTS)
-    y = np.random.uniform(-10, 10, N_POINTS)
-    
-    # Вычисляем z из уравнения плоскости
-    x0, y0, z0 = (0,0,0)
-    d = - (a*x0 + b*y0 + c*z0)
-    z = (-d - a*x - b*y) / c
-    
-    # Добавляем шум
-    noise = 0.01
-    noise_vec = np.random.uniform(-noise, noise, N_POINTS)
-    z += noise_vec
-    points = np.vstack((x,y,z)).T
-    return points
+    @pytest.fixture(scope='class', params=coeffs_list)
+    def coeffs(self, request):
+        return np.array(request.param, float)
 
-@pytest.fixture
-def acceptable_rmse():
-    return 0.2
-    
-def test_plane(plane_data, acceptable_rmse):
-    runsuck = RANSAC()
-    runsuck.add_points(plane_data)
+    @pytest.fixture(scope='class', params=approx_center_list)
+    def approx_center(self, request):
+        return np.array(request.param, float)
 
-    model = runsuck.fit(
-            Plane3D,
-            1000,
-            0.4
+    @pytest.fixture(scope='class')
+    def perfect_model(self, coeffs):
+        return Plane3D(*coeffs)
+
+    @pytest.fixture(
+        scope='class',
+        params=[0., 0.01, 0.02, 0.05, 0.1]
     )
-    result = model.get_model()
-    result_plane= np.array([
-        result['a'], 
-        result['b'], 
-        result['c'], 
-        result['d']
-    ])
+    def noise_sigma(self, request):
+        return request.param
 
-    data_target = np.array([0,
-                            0,
-                            1,
-                            0])
-    vec_mul = np.array([result_plane[1]*data_target[2] - result_plane[2]*data_target[1],
-                       result_plane[2]*data_target[0] - result_plane[0]*data_target[2],
-                       result_plane[0]*data_target[1] - result_plane[1]*data_target[0]])
-    assert np.linalg.norm(vec_mul) + result_plane[3]-data_target[3] < acceptable_rmse
+    @pytest.fixture(
+        scope='class',
+        params=[5000, 2500, 1000, 500]
+    )
+    def n_points(self, request):
+        return request.param
+
+    @pytest.fixture(scope='class')
+    def data_points(self, perfect_model, noise_sigma, n_points, approx_center):
+        return generate_plane(
+            perfect_model,
+            noise_sigma=noise_sigma,
+            n_points=n_points,
+            approx_center=approx_center,
+            plane_size=1
+        )
+
+    @pytest.fixture(scope='class')
+    def fit_model(self, data_points):
+        ransac = RANSAC(data_points)
+        model = ransac.fit(
+            Plane3D,
+            iter_num=1000,
+            distance_threshold=0.1
+        )
+        return model
+
+    @pytest.fixture()
+    def acceptable_relative_coeff_error(self):
+        return 0.1
+
+    @pytest.fixture()
+    def acceptable_point_rmse(self):
+        return 0.2
+
+    def test_coeffs_are_close(
+            self, 
+            perfect_model:Plane3D, 
+            fit_model:Plane3D,
+            acceptable_relative_coeff_error
+        ):
+        perfect = np.array([
+            perfect_model.a, 
+            perfect_model.b, 
+            perfect_model.c, 
+            perfect_model.d
+        ])
+        fit = np.array([
+            fit_model.a, 
+            fit_model.b, 
+            fit_model.c, 
+            fit_model.d
+        ])
+        # scale fit model
+        scale_idx = np.argmax(np.abs(perfect))
+        fit *= perfect[scale_idx]/fit[scale_idx]
+
+        diffs = np.abs(fit - perfect)
+        non_zero = np.logical_not(np.isclose(fit, 0))
+        non_zero_diffs = diffs[non_zero] / perfect[non_zero]
+        zero_diffs = diffs[np.logical_not(non_zero)]
+        assert (non_zero_diffs < acceptable_relative_coeff_error).all()
+        assert (zero_diffs < acceptable_relative_coeff_error).all()
+
+
+
+    def test_overall_close(
+            self,
+            perfect_model: Plane3D,
+            fit_model: Plane3D,
+            acceptable_point_rmse
+        ):
+        # Generate points on the perfect line
+        perfect_points = generate_plane(perfect_model, n_points=5000, noise_sigma=0)
+
+        # Calculate distances from these points to the fit line
+        distances = fit_model.calc_distances(perfect_points)
+        rmse = np.sqrt(np.mean(np.sum(distances**2)))
+
+        assert rmse < acceptable_point_rmse
+
+    def test_benchmark_starkit_ransac(
+            self, 
+            data_points,
+            benchmark
+        ):
+        ransac = RANSAC(data_points)
+        benchmark(
+            ransac.fit,
+            Plane3D,
+            500,
+            0.1
+        )
+
+    def test_benchmark_pyransac(
+            self, 
+            data_points,
+            benchmark
+        ):
+        line = pyransac3d.Plane()
+        benchmark(
+                line.fit,
+                data_points,
+                0.1,
+                500
+        )
+

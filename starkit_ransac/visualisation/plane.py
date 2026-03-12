@@ -7,7 +7,8 @@ def generate_plane_mesh(
         plane:Plane3D,
         color=[0, 1, 0],
         approx_center=[0, 0, 0],
-        size=10
+        size=10,
+        resolution=None
     ):
     a = plane.a
     b = plane.b
