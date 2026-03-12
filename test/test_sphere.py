@@ -5,6 +5,8 @@ from starkit_ransac.surfaces.sphere import Sphere
 from starkit_ransac.ransac_3d import RANSAC
 from conftest import RNG
 from starkit_ransac.generators.sphere import generate_sphere
+from pytest_benchmark.plugin import benchmark
+import pyransac3d
 
 class TestSphere:
     # numbers of variants of a parameter
@@ -159,3 +161,29 @@ class TestSphere:
         distances = perfect_model.calc_distances(points)
         expected = np.array([0.0, 0.5 * radius, 0.5 * radius])
         assert np.allclose(distances, expected)
+
+    def test_benchmark_starkit_ransac(
+            self, 
+            data_points, 
+            benchmark
+        ):
+        ransac = RANSAC(data_points)
+        benchmark(
+                ransac.fit,
+                Sphere,
+                500, 
+                0.1
+        )
+
+    def test_benchmark_pyransac(
+            self, 
+            data_points, 
+            benchmark
+        ):
+        sphere = pyransac3d.Sphere()
+        benchmark(
+                sphere.fit,
+                data_points,
+                0.1,
+                500, 
+        )
