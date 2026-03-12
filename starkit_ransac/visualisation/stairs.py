@@ -2,7 +2,10 @@ import open3d as o3d
 import numpy as np
 from starkit_ransac.surfaces.stairs import StepPlane
 
-def generate_stairs_mesh(stairs:StepPlane):
+def generate_stairs_mesh(
+        stairs:StepPlane,
+        resolution=None
+    ):
     planes = []
     thickness = 0.01
 

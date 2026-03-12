@@ -7,7 +7,8 @@ def generate_line3d_mesh(
         line:Line3D,
         color=[0, 1, 0],
         length=5,
-        midpoint=None
+        midpoint=None,
+        resolution=None
     ):
     if midpoint is None:
         midpoint = line.point
