@@ -18,7 +18,7 @@ class Sphere(AbstractSurfaceModel):
             self, 
             points: ArrayLike
         ):
-        points = np.array(points)
+        points = np.asarray(points)
         # sphere can be described as:
         # (x-a)^2 + (y-b)^2 + (z-c)^2 = r^2
         # let's extract a,b,c and r from it:
@@ -32,12 +32,11 @@ class Sphere(AbstractSurfaceModel):
         y = points[:, 1]
         z = points[:, 2]
 
-        rhs = x**2 + y**2 + z**2
-        A = np.array([
-            2*x, 2*y, 2*z, np.ones_like(x)
-        ]).T
-        abcd = np.linalg.solve(A, rhs)
-        a,b,c,d = abcd
+        rhs = np.sum(points*points, axis=-1)
+        A = np.column_stack([
+            2*x, 2*y, 2*z, np.ones(4)
+        ])
+        a,b,c,d = np.linalg.solve(A, rhs)
         r = np.sqrt(d + a**2 + b**2 + c**2)
 
         self.center = np.array([a, b, c])
@@ -45,7 +44,7 @@ class Sphere(AbstractSurfaceModel):
         return True
 
     def calc_distances(self, points: ArrayLike) -> NDArray:
-        return np.abs(np.linalg.norm(np.array(points) - self.center, axis=-1) - self.radius)
+        return np.abs(np.linalg.norm(self.center - points, axis=-1) - self.radius)
 
     def calc_distance_one_point(self, point: NDArray) -> float:
         return self.calc_distances([point])[0]
