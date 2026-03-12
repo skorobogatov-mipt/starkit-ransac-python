@@ -5,6 +5,9 @@ from starkit_ransac.surfaces.line3d import Line3D
 from starkit_ransac.generators.line3d import generate_line3d
 from conftest import RNG
 
+from pytest_benchmark.plugin import benchmark
+import pyransac3d
+
 class TestLine3D:
     # Numbers of variants of parameters
     N_POINTS = 5
@@ -147,3 +150,29 @@ class TestLine3D:
         ])
         distances = line.calc_distances(points_off_line)
         assert np.allclose(np.linalg.norm(distances, axis=1), 1)
+
+    def test_benchmark_starkit_ransac(
+            self, 
+            data_points,
+            benchmark
+        ):
+        ransac = RANSAC(data_points)
+        benchmark(
+            ransac.fit,
+            Line3D,
+            500,
+            0.1
+        )
+
+    def test_benchmark_pyransac(
+            self, 
+            data_points,
+            benchmark
+        ):
+        line = pyransac3d.Line()
+        benchmark(
+                line.fit,
+                data_points,
+                0.1,
+                500
+        )
