@@ -5,7 +5,7 @@ from starkit_ransac.generators import ellipsoid
 from starkit_ransac.generators.ellipsoid import generate_ellipsoid, generate_ellipsoid_poly
 from starkit_ransac.ransac_3d import RANSAC
 from starkit_ransac.surfaces.ellipsoid import Ellipsoid3D
-from starkit_ransac.visualisation.ellipsoid import generate_ellipsoid_mesh
+from starkit_ransac.visualisation.visualize import generate_mesh
 
 def main():
     np.random.seed(42)
@@ -36,7 +36,7 @@ def main():
     print(perfect_ellipsoid)
     print(model)
 
-    fitted_mesh = generate_ellipsoid_mesh(model)
+    fitted_mesh = generate_mesh(model)
 
     pcd = o3d.geometry.PointCloud()
     pcd.points = o3d.utility.Vector3dVector(data)
