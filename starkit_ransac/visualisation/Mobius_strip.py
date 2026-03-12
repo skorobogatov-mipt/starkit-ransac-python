@@ -4,9 +4,10 @@ import numpy as np
 def generate_mobius_mesh(
         mobius_strip, 
         color=np.array([1, 0, 0]), 
-        n_theta=1000, 
-        n_width=100,
+        resolution=100
     ):
+    n_theta = resolution * 10
+    n_width = resolution
     half_width = mobius_strip.width/2
     center = mobius_strip.center
     normal = mobius_strip.normal

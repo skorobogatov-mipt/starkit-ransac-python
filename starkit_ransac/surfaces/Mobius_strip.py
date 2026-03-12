@@ -4,7 +4,7 @@ from starkit_ransac.abstract_surface import AbstractSurfaceModel
 from numpy.typing import NDArray
 from copy import deepcopy
 
-class Mobius_strip(AbstractSurfaceModel):
+class MobiusStrip(AbstractSurfaceModel):
     def __init__(
             self, 
             center=[np.nan, np.nan, np.nan], 

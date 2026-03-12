@@ -1,7 +1,7 @@
 import pytest
 
 from starkit_ransac.ransac_3d import RANSAC
-from starkit_ransac.surfaces.Mobius_strip import Mobius_strip
+from starkit_ransac.surfaces.Mobius_strip import MobiusStrip
 from starkit_ransac.generators.Mobius_strip import generate_mobius
 import numpy as np
 
@@ -19,7 +19,7 @@ def test_generator_mobius_strip():
         [5, 5, 10]
     ])
     test_orientation = 1
-    test_mobius = Mobius_strip()
+    test_mobius = MobiusStrip()
     test_mobius.fit_model(test_info_points)
     return test_mobius
 
@@ -33,7 +33,7 @@ def point_data():
         [5, 5, 10]
     ])
     test_orientation = 1
-    test_mobius = Mobius_strip()
+    test_mobius = MobiusStrip()
     test_mobius.fit_model(test_info_points)
     
     test_noise_std = 0.5
@@ -82,7 +82,7 @@ def test_mobius_strip(point_data, acceptable_rmse, test_generator_mobius_strip):
     runsuck.add_points(point_data)
 
     result = runsuck.fit(
-            Mobius_strip,
+            MobiusStrip,
             N_ITERATIONS,
             0.5
     )
