@@ -36,13 +36,13 @@ def main():
             1200,
             0.06
     )
-    mesh = generate_mesh(model)
+    mesh = generate_mesh(model, color=(0, .5, 0))
     pcd = o3d.geometry.PointCloud()
     pcd.points = o3d.utility.Vector3dVector(data)
-    pcd.paint_uniform_color([0.9]*3)
+    pcd.paint_uniform_color([0.7]*3)
 
 
-    draw_pretty(mesh)
+    draw_pretty([mesh, pcd], point_size=5)
     # visualize_stairs(data, model)
 
 
