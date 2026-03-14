@@ -37,14 +37,19 @@ def _estimate_period(values: NDArray) -> float:
 class StepPlane(AbstractSurfaceModel):
     """Staircase model for RANSAC."""
 
-    def __init__(self) -> None:
+    def __init__(
+            self,
+            stair_height=np.nan,
+            step_width=np.nan,
+            step_height=np.nan,
+            rotation_deg=np.nan,
+        ) -> None:
         super().__init__()
-        self.model = {
-            "stair_height": np.nan,
-            "step_width": np.nan,
-            "step_height": np.nan,
-            "rotation_deg": np.nan,
-        }
+        self.stair_height = stair_height
+        self.step_width   = step_width
+        self.step_height  = step_height
+        self.rotation_deg = rotation_deg
+
         self.num_samples = 90
 
     @staticmethod
