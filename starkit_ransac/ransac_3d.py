@@ -1,3 +1,4 @@
+import open3d as o3d
 import pdb
 from starkit_ransac.generators.ellipsoid import generate_ellipsoid
 from time import sleep
@@ -5,6 +6,8 @@ import numpy as np
 from numpy.typing import NDArray
 from starkit_ransac.abstract_surface import AbstractSurfaceModel
 from copy import deepcopy
+
+from starkit_ransac.visualisation.visualize import generate_mesh, setup_visualizer
 
 class RANSAC:
     """RANSAC algorithm implementation for 3D surface fitting.
@@ -93,7 +96,9 @@ class RANSAC:
         best_model: AbstractSurfaceModel = None
         best_model_score = -1
 
+
         for _ in range(iter_num):
+
             sample = self.__sample()
             success = self.model.fit_model(sample)
             if not success:
@@ -105,8 +110,8 @@ class RANSAC:
             if score > best_model_score:
                 best_model = deepcopy(self.model)
                 best_model_score = score
-        return best_model
 
+        return best_model
     def __score_from_distances(
             self,
             distances: NDArray

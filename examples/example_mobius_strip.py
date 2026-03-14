@@ -3,7 +3,7 @@ from starkit_ransac.ransac_3d import RANSAC
 from starkit_ransac.surfaces.Mobius_strip import MobiusStrip
 from starkit_ransac.generators.Mobius_strip import generate_mobius
 from starkit_ransac.visualisation.Mobius_strip import generate_mobius_mesh
-from starkit_ransac.visualisation.visualize import setup_visualizer, generate_mesh
+from starkit_ransac.visualisation.visualize import draw_pretty, setup_visualizer, generate_mesh
 
 def main():
     sample_mobius = MobiusStrip(
@@ -31,11 +31,7 @@ def main():
     pcd = o3d.geometry.PointCloud()
     pcd.points = o3d.utility.Vector3dVector(data)
 
-    viz = setup_visualizer()
-
-    viz.add_geometry(pcd)
-    viz.add_geometry(mesh)
-    viz.run()
+    draw_pretty([mesh, pcd])
 
 if __name__ == "__main__":
     main()

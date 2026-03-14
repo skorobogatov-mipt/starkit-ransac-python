@@ -8,6 +8,8 @@ def generate_sphere_mesh(
         resolution:int=50
     ):
     R = sphere.radius
+    if R is None:
+        return o3d.geometry.LineSet()
     hs = np.linspace(-R, R, resolution)
     thetas = np.linspace(-np.pi, np.pi, resolution)
     

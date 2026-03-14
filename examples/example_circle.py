@@ -3,7 +3,7 @@ import open3d as o3d
 from starkit_ransac.generators.circle import generate_circle
 from starkit_ransac.ransac_3d import RANSAC
 from starkit_ransac.surfaces.circle import Circle3D
-from starkit_ransac.visualisation import generate_mesh, setup_visualizer
+from starkit_ransac.visualisation.visualize import draw_pretty, generate_mesh, setup_visualizer
 
 def main():
     perfect_model = Circle3D(
@@ -27,7 +27,6 @@ def main():
     )
 
 
-    viz = setup_visualizer()
 
     pcd = o3d.geometry.PointCloud()
     pcd.points = o3d.utility.Vector3dVector(data)
@@ -35,9 +34,15 @@ def main():
 
     mesh = generate_mesh(model, color=[0, 1, 0])
 
-    viz.add_geometry(pcd)
-    viz.add_geometry(mesh)
-    viz.run()
+    # o3d.visualization.draw(
+    #         [mesh, pcd],
+    #         bg_color=(0.2, 0.2, 0.2, 1),
+    #         show_skybox=False,
+    #         line_width=3,
+    #         point_size=2
+    # )
+
+    draw_pretty([mesh, pcd])
 
 if __name__ == "__main__":
     main()

@@ -55,12 +55,15 @@ def generate_stairs_mesh(
         )
         riser.rotate(R, center=(0, 0, 0))
         planes.append(riser)
+    for plane in planes[1:]:
+        planes[0] += plane
+
 
     # Добавляем оси координат
     # mesh_frame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.5)
     # planes.append(mesh_frame)
-
-    return planes
+    planes[0].paint_uniform_color(color)
+    return planes[0]
 
 def visualize_stairs(points, stairs:StepPlane):
     stairs_meshes = generate_stairs_mesh(stairs)

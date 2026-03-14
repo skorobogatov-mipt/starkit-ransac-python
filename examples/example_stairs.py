@@ -7,7 +7,7 @@ from starkit_ransac.ransac_3d import RANSAC
 from starkit_ransac.surfaces.stairs import StepPlane
 from starkit_ransac.generators.generators import generate_stairs
 from starkit_ransac.visualisation.stairs import generate_stairs_mesh, visualize_stairs
-from starkit_ransac.visualisation.visualize import generate_mesh, setup_visualizer
+from starkit_ransac.visualisation.visualize import draw_pretty, generate_mesh, setup_visualizer
 
 # Parameters of stairs
 N_POINTS = 650
@@ -36,17 +36,13 @@ def main():
             1200,
             0.06
     )
-    mesh = generate_mesh(model)
+    mesh = generate_mesh(model, color=(0, .5, 0))
     pcd = o3d.geometry.PointCloud()
     pcd.points = o3d.utility.Vector3dVector(data)
-    pcd.paint_uniform_color([0.9]*3)
+    pcd.paint_uniform_color([0.7]*3)
 
-    viz = setup_visualizer()
-    viz.add_geometry(pcd)
-    for item in mesh:
-        viz.add_geometry(item)
 
-    viz.run()
+    draw_pretty([mesh, pcd], point_size=5)
     # visualize_stairs(data, model)
 
 
