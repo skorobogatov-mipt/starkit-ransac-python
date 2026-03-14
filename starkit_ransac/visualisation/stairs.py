@@ -62,7 +62,7 @@ def generate_stairs_mesh(
     # Добавляем оси координат
     # mesh_frame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.5)
     # planes.append(mesh_frame)
-
+    planes[0].paint_uniform_color(color)
     return planes[0]
 
 def visualize_stairs(points, stairs:StepPlane):

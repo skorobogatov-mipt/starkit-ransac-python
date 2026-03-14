@@ -39,10 +39,10 @@ class StepPlane(AbstractSurfaceModel):
 
     def __init__(
             self,
-            stair_height=np.nan,
-            step_width=np.nan,
-            step_height=np.nan,
-            rotation_deg=np.nan,
+            stair_height=1,
+            step_width=1,
+            step_height=1,
+            rotation_deg=0
         ) -> None:
         super().__init__()
         self.stair_height = stair_height
