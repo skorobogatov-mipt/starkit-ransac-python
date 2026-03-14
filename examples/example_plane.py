@@ -4,6 +4,7 @@ from starkit_ransac.surfaces.plane import Plane3D
 from starkit_ransac.generators.plane import generate_plane
 from starkit_ransac.ransac_3d import RANSAC
 from starkit_ransac.visualisation import generate_mesh, setup_visualizer
+from starkit_ransac.visualisation.visualize import draw_pretty
 
 
 def main():
@@ -18,17 +19,13 @@ def main():
     ransac = RANSAC(data)
     fit_plane = ransac.fit(Plane3D, 1000, 0.05)
 
-    mesh = generate_mesh(fit_plane)
+    mesh = generate_mesh(fit_plane, color=[0., 0.7, 0])
 
     pcd = o3d.geometry.PointCloud()
     pcd.points = o3d.utility.Vector3dVector(data)
-    pcd.paint_uniform_color([0.9]*3)
+    pcd.paint_uniform_color([0.9, 0.3, 0.9])
 
-    viz = setup_visualizer()
-    viz.add_geometry(pcd)
-    viz.add_geometry(mesh)
-
-    viz.run()
+    draw_pretty([pcd, mesh], point_size=5)
 
 
 if __name__ == "__main__":

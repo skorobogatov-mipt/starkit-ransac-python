@@ -4,7 +4,7 @@ from starkit_ransac.ransac_3d import RANSAC
 from starkit_ransac.surfaces.line3d import Line3D
 from starkit_ransac.generators.line3d import generate_line3d
 from starkit_ransac.visualisation.line3d import generate_line3d_mesh
-from starkit_ransac.visualisation.visualize import setup_visualizer
+from starkit_ransac.visualisation.visualize import draw_pretty, setup_visualizer
 
 def main():
     perfect_line = Line3D(
@@ -26,11 +26,7 @@ def main():
     pcd.points = o3d.utility.Vector3dVector(data)
     pcd.paint_uniform_color([0.9, 0.9, 0.9])
 
-    viz = setup_visualizer()
-
-    viz.add_geometry(pcd)
-    viz.add_geometry(mesh)
-    viz.run()
+    draw_pretty([mesh, pcd])
 
 
 if __name__ == "__main__":
