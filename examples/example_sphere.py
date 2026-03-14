@@ -3,6 +3,7 @@ from starkit_ransac.ransac_3d import RANSAC
 from starkit_ransac.surfaces.sphere import Sphere
 from starkit_ransac.generators.sphere import generate_sphere
 from starkit_ransac.visualisation.sphere import generate_sphere_mesh
+from starkit_ransac.visualisation.visualize import generate_mesh, setup_visualizer
 
 def main():
     perfect_sphere = Sphere(
@@ -20,13 +21,17 @@ def main():
     print(perfect_sphere.radius)
     print(model.center)
 
-    mesh = generate_sphere_mesh(model)
+    mesh = generate_mesh(model, resolution=15)
 
     pcd = o3d.geometry.PointCloud()
     pcd.points = o3d.utility.Vector3dVector(data)
-    pcd.paint_uniform_color([0.5, 0.5, 0.5])
+    pcd.paint_uniform_color([0.9]*3)
 
-    o3d.visualization.draw_geometries([pcd, mesh])
+    viz = setup_visualizer()
+
+    viz.add_geometry(pcd)
+    viz.add_geometry(mesh)
+    viz.run()
 
 if __name__ == "__main__":
     main()
