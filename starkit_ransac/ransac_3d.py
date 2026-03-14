@@ -122,7 +122,7 @@ class RANSAC:
         for _ in range(iter_num):
             i += 1
             # this is for camera rotation
-            for k in range(10):
+            for k in range(5):
                 camera_pos[0] = orbit_radius * np.cos(angle)
                 camera_pos[1] = orbit_radius * np.sin(angle)
                 camera_pos[2] = 0 
@@ -133,8 +133,8 @@ class RANSAC:
                     camera_pos,
                     [0,0,1]
                 )
-                angle += 0.001
-                # sleep(0.001)
+                angle += 0.002
+                sleep(0.001)
 
             sample = self.__sample()
             success = self.model.fit_model(sample)
@@ -157,8 +157,8 @@ class RANSAC:
                 best_model_mesh = generate_mesh(best_model)
                 vis.add_geometry("best_model_mesh", best_model_mesh)
 
-            # vis.post_redraw()
-            # o3d.visualization.gui.Application.instance.run_one_tick()
+            vis.post_redraw()
+            o3d.visualization.gui.Application.instance.run_one_tick()
         
         vis.close()
         return best_model
