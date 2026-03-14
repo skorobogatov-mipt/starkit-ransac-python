@@ -1,3 +1,4 @@
+import open3d as o3d
 import pdb
 from starkit_ransac.generators.ellipsoid import generate_ellipsoid
 from time import sleep
@@ -5,6 +6,8 @@ import numpy as np
 from numpy.typing import NDArray
 from starkit_ransac.abstract_surface import AbstractSurfaceModel
 from copy import deepcopy
+
+from starkit_ransac.visualisation.visualize import generate_mesh
 
 class RANSAC:
     """RANSAC algorithm implementation for 3D surface fitting.
@@ -93,18 +96,62 @@ class RANSAC:
         best_model: AbstractSurfaceModel = None
         best_model_score = -1
 
+        # best_model_mesh = generate_mesh(self.model, color=(1,0,0))
+        #
+        # viz = o3d.visualization.Visualizer()
+        # viz.create_window()
+        #
+        # ctr = viz.get_view_control()
+        #
+        # opt = viz.get_render_option()
+        # opt.background_color = np.array([0.2, 0.2, 0.2])
+        # viz.get_render_option().line_width = 10.
+        # viz.get_render_option().point_size = 1
+        # # print(getattr(opt, 'line_width'))
+        #
+        # pcd = o3d.geometry.PointCloud()
+        # pcd.points = o3d.utility.Vector3dVector(self.__data)
+        # pcd.paint_uniform_color([0.9, 0.9, 0.9])
+        # viz.add_geometry(pcd)
+        # viz.add_geometry(best_model_mesh)
+        # hypothesis_mesh = generate_mesh(self.model)
+        # viz.add_geometry(hypothesis_mesh)
+        #
+        # viz.poll_events()
+        # viz.update_renderer()
+        # sleep(5)
+
+        i = 0
         for _ in range(iter_num):
+            # i += 1
+            # for j in range(10):
+            #     ctr.rotate(.5, 0.0)
+            #     sleep(0.001)
+            # viz.get_render_option().line_width = 10.
+            # viz.get_render_option().point_size = 1
+
             sample = self.__sample()
             success = self.model.fit_model(sample)
             if not success:
                 continue
 
+            # if i%5 == 0:
+            #     viz.remove_geometry(hypothesis_mesh, False)
+            #     hypothesis_mesh = generate_mesh(self.model, color=(1,0,0))
+            #     viz.add_geometry(hypothesis_mesh, False)
+
             distances = self.model.calc_distances(self.__data)
             score = self.__score_from_distances(distances)
             
+            # viz.poll_events()
             if score > best_model_score:
+                # viz.remove_geometry(best_model_mesh, False)
                 best_model = deepcopy(self.model)
                 best_model_score = score
+
+            #     best_model_mesh = generate_mesh(best_model)
+            #     viz.add_geometry(best_model_mesh, False)
+            # viz.update_renderer()
         return best_model
 
     def __score_from_distances(
