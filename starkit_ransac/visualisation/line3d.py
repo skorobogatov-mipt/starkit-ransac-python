@@ -18,4 +18,5 @@ def generate_line3d_mesh(
     mesh = o3d.geometry.LineSet()
     mesh.points = o3d.utility.Vector3dVector([p0, p1])
     mesh.lines = o3d.utility.Vector2iVector([[0, 1]])
+    mesh.paint_uniform_color(color)
     return mesh

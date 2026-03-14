@@ -1,4 +1,5 @@
 import open3d as o3d
+import numpy as np
 from starkit_ransac.surfaces import (
         Circle2D,
         Line3D,
@@ -28,7 +29,8 @@ TYPE_TO_GENERATOR = {
         Circle3D : generate_circle_mesh,
         Sphere : generate_sphere_mesh,
         Ellipsoid3D : generate_ellipsoid_mesh,
-        StepPlane : generate_stairs_mesh
+        StepPlane : generate_stairs_mesh,
+        MobiusStrip : generate_mobius_mesh
 }
 
 def generate_mesh(
@@ -40,3 +42,14 @@ def generate_mesh(
     func = TYPE_TO_GENERATOR[surface_type]
     return func(surface, resolution=resolution, color=color)
 
+def setup_visualizer():
+    viz = o3d.visualization.Visualizer()
+    viz.create_window()
+
+    opt = viz.get_render_option()
+    opt.background_color = np.array([0.2, 0.2, 0.2])
+    opt.line_width = 10.
+    opt.point_size = 5
+    opt.mesh_show_back_face = True
+    opt.mesh_show_wireframe = True
+    return viz

@@ -4,6 +4,7 @@ from starkit_ransac.surfaces.stairs import StepPlane
 
 def generate_stairs_mesh(
         stairs:StepPlane,
+        color=(0,1,0),
         resolution=None
     ):
     planes = []
@@ -56,8 +57,8 @@ def generate_stairs_mesh(
         planes.append(riser)
 
     # Добавляем оси координат
-    mesh_frame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.5)
-    planes.append(mesh_frame)
+    # mesh_frame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.5)
+    # planes.append(mesh_frame)
 
     return planes
 
