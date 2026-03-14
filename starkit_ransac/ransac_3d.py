@@ -96,71 +96,21 @@ class RANSAC:
         best_model: AbstractSurfaceModel = None
         best_model_score = -1
 
-        best_model_mesh = generate_mesh(self.model, color=(1,0,0))
 
-        pcd = o3d.geometry.PointCloud()
-        pcd.points = o3d.utility.Vector3dVector(self.__data)
-        pcd.paint_uniform_color([0.9, 0.9, 0.9])
-
-        hypothesis_mesh = generate_mesh(self.model)
-
-        # visualization stuff
-        vis = setup_visualizer()
-        orbit_radius = 20
-        data_center = np.mean(self.__data, axis=0)
-        camera_pos = data_center + [orbit_radius,0,0]
-        vis.setup_camera(
-            80,
-            data_center,
-            camera_pos,
-            [0,0,1]
-        )
-        vis.add_geometry("pcd", pcd)
-
-        i = 0
-        angle = 0.
         for _ in range(iter_num):
-            i += 1
-            # this is for camera rotation
-            for k in range(5):
-                camera_pos[0] = orbit_radius * np.cos(angle)
-                camera_pos[1] = orbit_radius * np.sin(angle)
-                camera_pos[2] = 0 
-                camera_pos += data_center
-                vis.setup_camera(
-                    80,
-                    pcd.get_center(),
-                    camera_pos,
-                    [0,0,1]
-                )
-                angle += 0.002
-                sleep(0.001)
 
             sample = self.__sample()
             success = self.model.fit_model(sample)
             if not success:
                 continue
 
-            if i%5 == 0:
-                vis.remove_geometry("hypothesis_mesh")
-                hypothesis_mesh = generate_mesh(self.model, color=(1,0,0))
-                vis.add_geometry("hypothesis_mesh", hypothesis_mesh)
-
             distances = self.model.calc_distances(self.__data)
             score = self.__score_from_distances(distances)
             
             if score > best_model_score:
-                vis.remove_geometry("best_model_mesh")
                 best_model = deepcopy(self.model)
                 best_model_score = score
 
-                best_model_mesh = generate_mesh(best_model)
-                vis.add_geometry("best_model_mesh", best_model_mesh)
-
-            vis.post_redraw()
-            o3d.visualization.gui.Application.instance.run_one_tick()
-        
-        vis.close()
         return best_model
     def __score_from_distances(
             self,
