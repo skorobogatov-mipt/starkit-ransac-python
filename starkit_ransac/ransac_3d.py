@@ -72,23 +72,23 @@ class RANSAC:
         ):
         """Fit a surface model to the point cloud using RANSAC.
         
-        Performs iterative random sampling and model fitting to find
-        the best surface model that maximizes the number of inliers.
-        
-        Parameters
-        ----------
-        object_type : type
-            The class type of the surface model to fit. Must be a subclass
-            of AbstractSurfaceModel.
-        iter_num : int
-            Number of RANSAC iterations to perform.
-        distance_threshold : float
-            Maximum distance for a point to be considered an inlier.
+            Performs iterative random sampling and model fitting to find
+            the best surface model that maximizes the number of inliers.
             
-        Returns
-        -------
-        best_model : AbstractSurfaceModel
-            The fitted surface model with the highest inlier count.
+            Parameters
+            ----------
+            object_type : type
+                The class type of the surface model to fit. Must be a subclass
+                of AbstractSurfaceModel.
+            iter_num : int
+                Number of RANSAC iterations to perform.
+            distance_threshold : float
+                Maximum distance for a point to be considered an inlier.
+                
+            Returns
+            -------
+            best_model : AbstractSurfaceModel
+                The fitted surface model with the highest inlier count.
         """
         self.__distance_threshold = distance_threshold
         self.model: AbstractSurfaceModel = object_type()
@@ -97,21 +97,35 @@ class RANSAC:
         best_model_score = -1
 
 
-        for _ in range(iter_num):
+        n_data = self.__data.shape[0]
+        # random_matrix = np.random.rand(iter_num, self.__data.shape[0])
+        # indices = np.random.choice(
+        #         self.__data.shape[0], 
+        #         size=(iter_num, self.model.num_samples),
+        #         replace=False
+        # )
+        # indices = np.argpartition(random_matrix, self.model.num_samples, axis=1)[:, :self.model.num_samples]
+        indices = np.random.randint(0, n_data, (iter_num, self.model.num_samples))
+        n_models = 0
+        for idx in indices:
 
-            sample = self.__sample()
+            if len(np.unique(idx)) != self.model.num_samples:
+                idx = np.random.choice(n_data, size=self.model.num_samples, replace=False)
+
+            sample = self.__data[idx]
             success = self.model.fit_model(sample)
+            n_models += 1
             if not success:
                 continue
 
             distances = self.model.calc_distances(self.__data)
             score = self.__score_from_distances(distances)
-            
             if score > best_model_score:
                 best_model = deepcopy(self.model)
                 best_model_score = score
 
         return best_model
+
     def __score_from_distances(
             self,
             distances: NDArray
