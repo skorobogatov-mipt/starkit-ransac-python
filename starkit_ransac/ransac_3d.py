@@ -7,7 +7,7 @@ from numpy.typing import NDArray
 from starkit_ransac.abstract_surface import AbstractSurfaceModel
 from copy import deepcopy
 
-from starkit_ransac.visualisation.visualize import generate_mesh
+from starkit_ransac.visualisation.visualize import generate_mesh, setup_visualizer
 
 class RANSAC:
     """RANSAC algorithm implementation for 3D surface fitting.
@@ -96,64 +96,72 @@ class RANSAC:
         best_model: AbstractSurfaceModel = None
         best_model_score = -1
 
-        # best_model_mesh = generate_mesh(self.model, color=(1,0,0))
-        #
-        # viz = o3d.visualization.Visualizer()
-        # viz.create_window()
-        #
-        # ctr = viz.get_view_control()
-        #
-        # opt = viz.get_render_option()
-        # opt.background_color = np.array([0.2, 0.2, 0.2])
-        # viz.get_render_option().line_width = 10.
-        # viz.get_render_option().point_size = 1
-        # # print(getattr(opt, 'line_width'))
-        #
-        # pcd = o3d.geometry.PointCloud()
-        # pcd.points = o3d.utility.Vector3dVector(self.__data)
-        # pcd.paint_uniform_color([0.9, 0.9, 0.9])
-        # viz.add_geometry(pcd)
-        # viz.add_geometry(best_model_mesh)
-        # hypothesis_mesh = generate_mesh(self.model)
-        # viz.add_geometry(hypothesis_mesh)
-        #
-        # viz.poll_events()
-        # viz.update_renderer()
-        # sleep(5)
+        best_model_mesh = generate_mesh(self.model, color=(1,0,0))
+
+        pcd = o3d.geometry.PointCloud()
+        pcd.points = o3d.utility.Vector3dVector(self.__data)
+        pcd.paint_uniform_color([0.9, 0.9, 0.9])
+
+        hypothesis_mesh = generate_mesh(self.model)
+
+        # visualization stuff
+        vis = setup_visualizer()
+        orbit_radius = 20
+        data_center = np.mean(self.__data, axis=0)
+        camera_pos = data_center + [orbit_radius,0,0]
+        vis.setup_camera(
+            80,
+            data_center,
+            camera_pos,
+            [0,0,1]
+        )
+        vis.add_geometry("pcd", pcd)
 
         i = 0
+        angle = 0.
         for _ in range(iter_num):
-            # i += 1
-            # for j in range(10):
-            #     ctr.rotate(.5, 0.0)
-            #     sleep(0.001)
-            # viz.get_render_option().line_width = 10.
-            # viz.get_render_option().point_size = 1
+            i += 1
+            # this is for camera rotation
+            for k in range(10):
+                camera_pos[0] = orbit_radius * np.cos(angle)
+                camera_pos[1] = orbit_radius * np.sin(angle)
+                camera_pos[2] = 0 
+                camera_pos += data_center
+                vis.setup_camera(
+                    80,
+                    pcd.get_center(),
+                    camera_pos,
+                    [0,0,1]
+                )
+                angle += 0.001
+                # sleep(0.001)
 
             sample = self.__sample()
             success = self.model.fit_model(sample)
             if not success:
                 continue
 
-            # if i%5 == 0:
-            #     viz.remove_geometry(hypothesis_mesh, False)
-            #     hypothesis_mesh = generate_mesh(self.model, color=(1,0,0))
-            #     viz.add_geometry(hypothesis_mesh, False)
+            if i%5 == 0:
+                vis.remove_geometry("hypothesis_mesh")
+                hypothesis_mesh = generate_mesh(self.model, color=(1,0,0))
+                vis.add_geometry("hypothesis_mesh", hypothesis_mesh)
 
             distances = self.model.calc_distances(self.__data)
             score = self.__score_from_distances(distances)
             
-            # viz.poll_events()
             if score > best_model_score:
-                # viz.remove_geometry(best_model_mesh, False)
+                vis.remove_geometry("best_model_mesh")
                 best_model = deepcopy(self.model)
                 best_model_score = score
 
-            #     best_model_mesh = generate_mesh(best_model)
-            #     viz.add_geometry(best_model_mesh, False)
-            # viz.update_renderer()
-        return best_model
+                best_model_mesh = generate_mesh(best_model)
+                vis.add_geometry("best_model_mesh", best_model_mesh)
 
+            # vis.post_redraw()
+            # o3d.visualization.gui.Application.instance.run_one_tick()
+        
+        vis.close()
+        return best_model
     def __score_from_distances(
             self,
             distances: NDArray
