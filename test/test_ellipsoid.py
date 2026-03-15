@@ -8,6 +8,8 @@ import numpy as np
 from conftest import RNG
 from starkit_ransac.utils import normalize
 
+import scuf
+
 class TestEllipsoid3D:
     # numbers of variants of a parameter
     N_CENTERS = 5
@@ -150,6 +152,7 @@ class TestEllipsoid3D:
     def acceptable_point_rmse(self):
         return 0.5
 
+
     def test_overall_close(
             self,
             perfect_model:Ellipsoid3D,
@@ -160,5 +163,30 @@ class TestEllipsoid3D:
         distances = fit_model.calc_distances(perfect_points)
         rmse = np.sqrt(np.mean(distances**2))
         assert rmse < acceptable_point_rmse
+
+    def test_benchmark_starkit_ransac(
+            self,
+            data_points,
+            benchmark
+        ):
+        ransac = RANSAC(data_points)
+        benchmark(
+            ransac.fit,
+            Ellipsoid3D,
+            500,
+            0.1
+        )
+
+    def test_benchmark_scuf(
+            self,
+            data_points,
+            benchmark
+        ):
+        IS = scuf.ransac.RANSAC(figure="ellipsoid")
+        result = benchmark(
+                IS.fit,
+                data_points,
+                iterations=500
+        )
 
 

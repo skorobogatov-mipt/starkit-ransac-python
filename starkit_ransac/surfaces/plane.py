@@ -68,4 +68,5 @@ class Plane3D(AbstractSurfaceModel):
         return np.abs((points @ self.coeffs[:3] + self.d)) / norm
 
     def calc_distance_one_point(self, point: NDArray):
-        return self.calc_distances(np.array([point]))[0]
+        norm = np.linalg.norm(self.coeffs[:3])
+        return np.abs(np.dot(point, self.coeffs[:3]) + self.d) / norm

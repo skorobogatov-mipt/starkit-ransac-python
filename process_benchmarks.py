@@ -13,7 +13,7 @@ def is_benchmark_starkit(benchmark):
     return "test_benchmark_starkit_ransac" in benchmark['name']
 
 def is_benchmark_pyransac(benchmark):
-    return "test_benchmark_pyransac" in benchmark['name']
+    return "test_benchmark_scuf" in benchmark['name']
 
 def which_target(benchmark, targets):
     for target in targets:
@@ -37,7 +37,8 @@ def main():
             'test_circle',
             'test_line',
             'test_sphere',
-            'test_plane'
+            'test_plane',
+            'test_ellipsoid'
     ]
     total_time_starkit = {}
     total_time_pyransac = {}
@@ -92,7 +93,7 @@ def main():
             pyransac_bar, 
             pyransac_avgs, 
             w,
-            label='pyransac-3d',
+            label='scuf',
             color=(1,0,0)
     )
     plt.xticks(stransac_bar + w/2, collected_shapes, fontsize=24)

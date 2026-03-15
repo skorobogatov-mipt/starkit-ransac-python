@@ -132,17 +132,17 @@ class Ellipsoid3D(AbstractSurfaceModel):
             y,
             z
         ]).T
-        polynomial = np.linalg.solve(
-                eq_matrix, np.ones(len(points))
-        )
-        self.polynomial = polynomial
 
         try:
+            polynomial = np.linalg.solve(
+                    eq_matrix, np.ones(len(points))
+            )
+            self.polynomial = polynomial
             axes, radii, center = self.polynomial_to_axes(polynomial)
         except LinAlgError as lae:
-            self.center = np.inf
-            self.axes = np.inf
-            self.radii = np.inf
+            self.center = np.full(3, np.nan)
+            self.axes = np.full((3,3), np.nan)
+            self.radii = np.full(3, np.nan)
             return False
         axes, radii = self.sort_axes_and_radii(axes, radii)
 
@@ -219,7 +219,6 @@ class Ellipsoid3D(AbstractSurfaceModel):
         x = points[:, 0]
         y = points[:, 1]
         z = points[:, 2]
-        # numpy multiplication for speed
         poly_values = np.dot(
             poly, 
             np.array([
