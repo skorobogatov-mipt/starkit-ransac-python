@@ -6,6 +6,10 @@ from starkit_ransac.surfaces.ellipse2d import Ellipse2D
 from starkit_ransac.generators.ellipse2d import generate_ellipse2d
 from conftest import RNG
 
+from pytest_benchmark.plugin import benchmark
+
+import scuf
+
 
 class TestEllipse2D:
     N_CENTERS = 5
@@ -162,3 +166,29 @@ class TestEllipse2D:
         rmse = np.sqrt(np.mean(distances ** 2))
 
         assert rmse < acceptable_point_rmse
+
+    def test_benchmark_starkit_ransac(
+            self,
+            data_points,
+            benchmark
+        ):
+        ransac = RANSAC(data_points)
+        benchmark(
+                ransac.fit,
+                Ellipse2D,
+                1000,
+                0.1,
+        )
+
+    def test_benchmark_scuf(
+            self,
+            data_points,
+            benchmark
+        ):
+        rs = scuf.ransac.RANSAC(firgure='ellipse')
+        benchmark(
+                rs.fit,
+                data_points,
+                iterations=1000,
+                threshold=0.1
+        )

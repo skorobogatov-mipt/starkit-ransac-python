@@ -173,7 +173,7 @@ class TestEllipsoid3D:
         benchmark(
             ransac.fit,
             Ellipsoid3D,
-            500,
+            1000,
             0.1
         )
 
@@ -186,7 +186,8 @@ class TestEllipsoid3D:
         result = benchmark(
                 IS.fit,
                 data_points,
-                iterations=500
+                iterations=1000,
+                threshold=0.1
         )
 
 

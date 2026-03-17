@@ -187,3 +187,16 @@ class TestSphere:
                 0.1,
                 500, 
         )
+
+    def test_benchmark_scuf(
+            self,
+            data_points,
+            benchmark
+        ):
+        rs = scuf.ransac.RANSAC(figure='ellipsoid')
+        benchmark(
+                rs.fit,
+                data_points,
+                iterations=500,
+                threshold=0.1
+        )

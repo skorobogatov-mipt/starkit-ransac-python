@@ -6,7 +6,9 @@ from starkit_ransac.generators.plane import generate_plane
 from conftest import RNG
 
 from pytest_benchmark.plugin import benchmark
+
 import pyransac3d
+import scuf
 
 class TestPlane3D:
     approx_center_list = [
@@ -142,9 +144,22 @@ class TestPlane3D:
         ):
         line = pyransac3d.Plane()
         benchmark(
-                line.fit,
-                data_points,
-                0.1,
-                500
+            line.fit,
+            data_points,
+            0.1,
+            500
+        )
+
+    def test_benchmark_scuf(
+        self,
+        data_points,
+        benchmark
+    ):
+        rs = scuf.ransac.RANSAC(figure='plane')
+        result = benchmark(
+            rs.fit,
+            data_points,
+            iterations=1000,
+            threshold=0.1
         )
 
