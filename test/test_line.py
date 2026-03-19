@@ -3,10 +3,12 @@ import numpy as np
 from starkit_ransac.ransac_3d import RANSAC
 from starkit_ransac.surfaces.line3d import Line3D
 from starkit_ransac.generators.line3d import generate_line3d
-from conftest import RNG
+from conftest import BENCHMARK_THRESH, N_ITER_BENCHMARK, RNG
 
 from pytest_benchmark.plugin import benchmark
+
 import pyransac3d
+import scuf
 
 class TestLine3D:
     # Numbers of variants of parameters
@@ -160,8 +162,8 @@ class TestLine3D:
         benchmark(
             ransac.fit,
             Line3D,
-            500,
-            0.1
+            N_ITER_BENCHMARK,
+            BENCHMARK_THRESH
         )
 
     def test_benchmark_pyransac(
@@ -173,6 +175,7 @@ class TestLine3D:
         benchmark(
                 line.fit,
                 data_points,
-                0.1,
-                500
+                BENCHMARK_THRESH,
+                N_ITER_BENCHMARK
         )
+

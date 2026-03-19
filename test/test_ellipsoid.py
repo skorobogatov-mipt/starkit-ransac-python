@@ -5,10 +5,11 @@ from starkit_ransac.surfaces.ellipsoid import Ellipsoid3D
 from starkit_ransac.generators.ellipsoid import generate_ellipsoid
 import numpy as np
 
-from conftest import RNG
+from conftest import BENCHMARK_THRESH, N_ITER_BENCHMARK, RNG
 from starkit_ransac.utils import normalize
 
 import scuf
+import pyransac3d
 
 class TestEllipsoid3D:
     # numbers of variants of a parameter
@@ -173,8 +174,8 @@ class TestEllipsoid3D:
         benchmark(
             ransac.fit,
             Ellipsoid3D,
-            1000,
-            0.1
+            N_ITER_BENCHMARK,
+            BENCHMARK_THRESH
         )
 
     def test_benchmark_scuf(
@@ -186,8 +187,7 @@ class TestEllipsoid3D:
         result = benchmark(
                 IS.fit,
                 data_points,
-                iterations=1000,
-                threshold=0.1
+                iterations=N_ITER_BENCHMARK,
+                threshold=BENCHMARK_THRESH
         )
-
 

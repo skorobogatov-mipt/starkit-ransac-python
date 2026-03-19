@@ -4,7 +4,7 @@ import numpy as np
 from starkit_ransac.ransac_3d import RANSAC
 from starkit_ransac.surfaces.ellipse2d import Ellipse2D
 from starkit_ransac.generators.ellipse2d import generate_ellipse2d
-from conftest import RNG
+from conftest import BENCHMARK_THRESH, RNG, N_ITER_BENCHMARK
 
 from pytest_benchmark.plugin import benchmark
 
@@ -176,19 +176,19 @@ class TestEllipse2D:
         benchmark(
                 ransac.fit,
                 Ellipse2D,
-                1000,
-                0.1,
+                N_ITER_BENCHMARK,
+                BENCHMARK_THRESH
         )
 
-    def test_benchmark_scuf(
-            self,
-            data_points,
-            benchmark
-        ):
-        rs = scuf.ransac.RANSAC(firgure='ellipse')
-        benchmark(
-                rs.fit,
-                data_points,
-                iterations=1000,
-                threshold=0.1
-        )
+    # def test_benchmark_scuf(
+    #         self,
+    #         data_points,
+    #         benchmark
+    #     ):
+    #     rs = scuf.ransac.RANSAC(figure='ellipse')
+    #     benchmark(
+    #         rs.fit,
+    #         data_points,
+    #         iterations=1000,
+    #         threshold=0.1
+    #     )

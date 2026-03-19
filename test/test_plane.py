@@ -3,7 +3,7 @@ import numpy as np
 from starkit_ransac.ransac_3d import RANSAC
 from starkit_ransac.surfaces.plane import Plane3D
 from starkit_ransac.generators.plane import generate_plane
-from conftest import RNG
+from conftest import BENCHMARK_THRESH, N_ITER_BENCHMARK, RNG
 
 from pytest_benchmark.plugin import benchmark
 
@@ -133,8 +133,8 @@ class TestPlane3D:
         benchmark(
             ransac.fit,
             Plane3D,
-            500,
-            0.1
+            N_ITER_BENCHMARK,
+            BENCHMARK_THRESH
         )
 
     def test_benchmark_pyransac(
@@ -146,20 +146,7 @@ class TestPlane3D:
         benchmark(
             line.fit,
             data_points,
-            0.1,
-            500
-        )
-
-    def test_benchmark_scuf(
-        self,
-        data_points,
-        benchmark
-    ):
-        rs = scuf.ransac.RANSAC(figure='plane')
-        result = benchmark(
-            rs.fit,
-            data_points,
-            iterations=1000,
-            threshold=0.1
+            BENCHMARK_THRESH,
+            N_ITER_BENCHMARK
         )
 

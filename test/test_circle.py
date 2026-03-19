@@ -4,7 +4,7 @@ import pytest
 from starkit_ransac.generators.circle import generate_circle
 from starkit_ransac.surfaces.circle import Circle3D
 from starkit_ransac.ransac_3d import RANSAC
-from conftest import SEED,RNG
+from conftest import BENCHMARK_THRESH, N_ITER_BENCHMARK, SEED,RNG
 from pytest_benchmark.plugin import benchmark
 
 class TestCircle3D:
@@ -120,8 +120,8 @@ class TestCircle3D:
         benchmark(
             ransac.fit,
             Circle3D,
-            500,
-            0.1
+            N_ITER_BENCHMARK,
+            BENCHMARK_THRESH
         )
 
     def test_benchmark_pyransac(self, circle_data, benchmark):
@@ -129,7 +129,7 @@ class TestCircle3D:
         benchmark(
             circle.fit,
             circle_data,
-            0.1,
-            500,
+            BENCHMARK_THRESH,
+            N_ITER_BENCHMARK
         )
 

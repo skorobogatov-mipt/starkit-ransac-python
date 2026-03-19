@@ -3,10 +3,12 @@ import numpy as np
 from numpy.typing import ArrayLike, NDArray
 from starkit_ransac.surfaces.sphere import Sphere
 from starkit_ransac.ransac_3d import RANSAC
-from conftest import RNG
+from conftest import BENCHMARK_THRESH, N_ITER_BENCHMARK, RNG
 from starkit_ransac.generators.sphere import generate_sphere
 from pytest_benchmark.plugin import benchmark
+
 import pyransac3d
+import scuf
 
 class TestSphere:
     # numbers of variants of a parameter
@@ -171,8 +173,8 @@ class TestSphere:
         benchmark(
                 ransac.fit,
                 Sphere,
-                500, 
-                0.1
+                N_ITER_BENCHMARK,
+                BENCHMARK_THRESH
         )
 
     def test_benchmark_pyransac(
@@ -182,10 +184,10 @@ class TestSphere:
         ):
         sphere = pyransac3d.Sphere()
         benchmark(
-                sphere.fit,
-                data_points,
-                0.1,
-                500, 
+            sphere.fit,
+            data_points,
+            BENCHMARK_THRESH,
+            N_ITER_BENCHMARK
         )
 
     def test_benchmark_scuf(
@@ -195,8 +197,8 @@ class TestSphere:
         ):
         rs = scuf.ransac.RANSAC(figure='ellipsoid')
         benchmark(
-                rs.fit,
-                data_points,
-                iterations=500,
-                threshold=0.1
+            rs.fit,
+            data_points,
+            iterations=N_ITER_BENCHMARK,
+            threshold=BENCHMARK_THRESH
         )

@@ -1,3 +1,4 @@
+import pdb
 import numpy as np
 import pytest
 from starkit_ransac.generators.circle2d import generate_circle2D
@@ -63,7 +64,7 @@ class TestCircle2D:
 
         model = ransac.fit(
             Circle2D,
-            500,
+            1000,
             0.1
         )
         return model
