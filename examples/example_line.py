@@ -6,19 +6,12 @@ from starkit_ransac.generators.line3d import generate_line3d
 from starkit_ransac.visualisation.line3d import generate_line3d_mesh
 from starkit_ransac.visualisation.visualize import draw_pretty, setup_visualizer
 
+
 def main():
-    perfect_line = Line3D(
-        direction=[0.5, 0.5, 0.5],
-        point=[1, 0, -2.4]
-    )
+    perfect_line = Line3D(direction=[0.5, 0.5, 0.5], point=[1, 0, -2.4])
     data = generate_line3d(perfect_line)
     ransac = RANSAC(data)
-    model = ransac.fit(
-            object_type=Line3D,
-            iter_num=100,
-            distance_threshold=0.1
-    )
-    
+    model = ransac.fit(object_type=Line3D, iter_num=100, distance_threshold=0.1)
 
     mesh = generate_line3d_mesh(model, length=20)
 

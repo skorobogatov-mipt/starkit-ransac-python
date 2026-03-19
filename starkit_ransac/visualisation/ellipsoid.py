@@ -2,11 +2,10 @@ import open3d as o3d
 import numpy as np
 from starkit_ransac.surfaces.ellipsoid import Ellipsoid3D
 
+
 def generate_ellipsoid_mesh(
-        ellipsoid:Ellipsoid3D,
-        color=[0, 1, 0],
-        resolution:int=50
-    ):
+    ellipsoid: Ellipsoid3D, color=[0, 1, 0], resolution: int = 50
+):
     # x = a sin(theta) cos(phi)
     # y = b sin(theta) sin(phi)
     # z = c cos(theta)
@@ -23,15 +22,15 @@ def generate_ellipsoid_mesh(
             cur_point = [
                 a * np.sin(th) * np.cos(phi),
                 b * np.sin(th) * np.sin(phi),
-                c * np.cos(th)
+                c * np.cos(th),
             ]
             points.append(cur_point)
-            lines.append([i, i+resolution])
-            lines.append([i, i+1])
+            lines.append([i, i + resolution])
+            lines.append([i, i + 1])
             i += 1
 
     # FIXME this is dirty, but whatever
-    lines = lines[:-resolution*2]
+    lines = lines[: -resolution * 2]
     points = np.array(points)
 
     rotation = ellipsoid.axes.T
@@ -44,4 +43,3 @@ def generate_ellipsoid_mesh(
     mesh.lines = o3d.utility.Vector2iVector(lines)
     mesh.paint_uniform_color(color)
     return mesh
-

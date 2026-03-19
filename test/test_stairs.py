@@ -36,25 +36,21 @@ def acceptable_rmse():
 
 
 def test_stairs(
-        stairs_data,
-        acceptable_rmse,
-    ):
+    stairs_data,
+    acceptable_rmse,
+):
     # Fitting model stairs RANSAC
     runsuck = RANSAC()
     runsuck.add_points(stairs_data)
 
     np.random.seed(SEED)
-    model = runsuck.fit(
-            StepPlane,
-            1200,
-            0.06
-    )
+    model = runsuck.fit(StepPlane, 1200, 0.06)
     result = model.get_model()
     print("RESULT : ", result)
     distances = model.calc_distances(stairs_data)
-    rmse = np.sqrt(np.mean(distances ** 2))
+    rmse = np.sqrt(np.mean(distances**2))
 
-    assert np.isfinite(result['step_width']) and result['step_width'] > 0
-    assert np.isfinite(result['step_height']) and result['step_height'] > 0
-    assert np.isfinite(result['rotation_deg'])
+    assert np.isfinite(result["step_width"]) and result["step_width"] > 0
+    assert np.isfinite(result["step_height"]) and result["step_height"] > 0
+    assert np.isfinite(result["rotation_deg"])
     assert rmse < acceptable_rmse

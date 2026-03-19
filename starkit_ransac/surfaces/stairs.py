@@ -13,7 +13,7 @@ def _estimate_period(values: NDArray) -> float:
 
     if v_range <= 0:
         return 1.0
-      
+
     n_bins = 256
     hist, edges = np.histogram(values, bins=n_bins, range=(v_min, v_max))
     signal = hist.astype(float) - np.mean(hist)
@@ -24,7 +24,7 @@ def _estimate_period(values: NDArray) -> float:
     periods = lags * bin_w
 
     valid = (periods > (v_range / 40.0)) & (periods < (v_range / 2.0))
-    
+
     if not np.any(valid):
         return max(v_range / 6.0, 1e-3)
 
@@ -33,21 +33,16 @@ def _estimate_period(values: NDArray) -> float:
     return float(best_lag * bin_w)
 
 
-
 class StepPlane(AbstractSurfaceModel):
     """Staircase model for RANSAC."""
 
     def __init__(
-            self,
-            stair_height=1,
-            step_width=1,
-            step_height=1,
-            rotation_deg=0
-        ) -> None:
+        self, stair_height=1, step_width=1, step_height=1, rotation_deg=0
+    ) -> None:
         super().__init__()
         self.stair_height = stair_height
-        self.step_width   = step_width
-        self.step_height  = step_height
+        self.step_width = step_width
+        self.step_height = step_height
         self.rotation_deg = rotation_deg
 
         self.num_samples = 90
@@ -163,7 +158,7 @@ class StepPlane(AbstractSurfaceModel):
         z_tread = k_floor * step_height
         dist_tread = np.abs(z_local - z_tread)
         k_round = np.round((x_local) / step_width)
-        x_riser =  k_round * step_width
+        x_riser = k_round * step_width
         dist_riser = np.abs(x_local - x_riser)
 
         return dist_tread

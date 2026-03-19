@@ -12,14 +12,14 @@ def main():
         a=np.random.random(),
         b=np.random.random(),
         c=np.random.random(),
-        d=np.random.random()
+        d=np.random.random(),
     )
     data = generate_plane(perfect_plane)
-    
+
     ransac = RANSAC(data)
     fit_plane = ransac.fit(Plane3D, 1000, 0.05)
 
-    mesh = generate_mesh(fit_plane, color=[0., 0.7, 0])
+    mesh = generate_mesh(fit_plane, color=[0.0, 0.7, 0])
 
     pcd = o3d.geometry.PointCloud()
     pcd.points = o3d.utility.Vector3dVector(data)

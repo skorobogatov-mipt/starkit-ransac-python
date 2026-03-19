@@ -163,22 +163,13 @@ class TestEllipse2D:
         )
 
         distances = fit_model.calc_distances(perfect_points)
-        rmse = np.sqrt(np.mean(distances ** 2))
+        rmse = np.sqrt(np.mean(distances**2))
 
         assert rmse < acceptable_point_rmse
 
-    def test_benchmark_starkit_ransac(
-            self,
-            data_points,
-            benchmark
-        ):
+    def test_benchmark_starkit_ransac(self, data_points, benchmark):
         ransac = RANSAC(data_points)
-        benchmark(
-                ransac.fit,
-                Ellipse2D,
-                N_ITER_BENCHMARK,
-                BENCHMARK_THRESH
-        )
+        benchmark(ransac.fit, Ellipse2D, N_ITER_BENCHMARK, BENCHMARK_THRESH)
 
     # def test_benchmark_scuf(
     #         self,

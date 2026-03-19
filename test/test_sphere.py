@@ -10,22 +10,21 @@ from pytest_benchmark.plugin import benchmark
 import pyransac3d
 import scuf
 
+
 class TestSphere:
     # numbers of variants of a parameter
     N_CENTERS = 5
     N_RADII = 5
     MAX_OFFSET = 20
 
-    centers_list = (
-        RNG.random((N_CENTERS, 3)) * MAX_OFFSET
-    ).tolist()
+    centers_list = (RNG.random((N_CENTERS, 3)) * MAX_OFFSET).tolist()
 
     MAX_RADIUS = 5
     radii_list = (
         np.abs(RNG.random(N_RADII) * MAX_RADIUS) + 0.1  # ensure radius > 0
     ).tolist()
 
-    @pytest.fixture(scope='class', params=centers_list)
+    @pytest.fixture(scope="class", params=centers_list)
     def center(self, request):
         return np.array(request.param)
 
@@ -33,44 +32,28 @@ class TestSphere:
     def radius(self, request):
         return request.param
 
-    @pytest.fixture(scope='class')
-    def perfect_model(
-            self,
-            center,
-            radius
-        ):
+    @pytest.fixture(scope="class")
+    def perfect_model(self, center, radius):
         return Sphere(center, radius)
 
-    @pytest.fixture(
-            scope='class',
-            params=[0., 0.01, 0.02, 0.05, 0.1]
-    )
+    @pytest.fixture(scope="class", params=[0.0, 0.01, 0.02, 0.05, 0.1])
     def noise_sigma(self, request):
         return request.param
 
-    @pytest.fixture(
-            scope='class',
-            params=[5000, 2500, 1000, 500]
-    )
+    @pytest.fixture(scope="class", params=[5000, 2500, 1000, 500])
     def n_points(self, request):
         return request.param
 
-    @pytest.fixture(scope='class')
+    @pytest.fixture(scope="class")
     def data_points(self, perfect_model, noise_sigma, n_points):
         return generate_sphere(
-                perfect_model, 
-                noise_sigma=noise_sigma, 
-                n_points=n_points
+            perfect_model, noise_sigma=noise_sigma, n_points=n_points
         )
 
-    @pytest.fixture(scope='class')
+    @pytest.fixture(scope="class")
     def fit_model(self, data_points):
         ransac = RANSAC(data_points)
-        model = ransac.fit(
-            Sphere,
-            5000,
-            0.1
-        )
+        model = ransac.fit(Sphere, 5000, 0.1)
         return model
 
     @pytest.fixture()
@@ -85,36 +68,28 @@ class TestSphere:
     def acceptable_point_rmse(self):
         return 0.5
 
-    def test_radius_is_close(self, fit_model, perfect_model, acceptable_radius_relative_error):
+    def test_radius_is_close(
+        self, fit_model, perfect_model, acceptable_radius_relative_error
+    ):
         actual = perfect_model.radius
         fit = fit_model.radius
         diff = np.abs((actual - fit) / actual)
         assert diff < acceptable_radius_relative_error
 
     def test_center_is_close(
-            self,
-            fit_model,
-            perfect_model,
-            acceptable_center_distance
-        ):
+        self, fit_model, perfect_model, acceptable_center_distance
+    ):
         actual = perfect_model.center
         fit = fit_model.center
         diff = np.linalg.norm(actual - fit)
         assert diff < acceptable_center_distance
 
     def test_overall_close(
-            self,
-            perfect_model: Sphere,
-            fit_model: Sphere,
-            acceptable_point_rmse
-        ):
+        self, perfect_model: Sphere, fit_model: Sphere, acceptable_point_rmse
+    ):
         # Generate points on the perfect sphere
         n_points = 5000
-        points = generate_sphere(
-                perfect_model,
-                n_points=n_points,
-                noise_sigma=0
-        )
+        points = generate_sphere(perfect_model, n_points=n_points, noise_sigma=0)
 
         # Calculate distances to the fitted sphere
         distances = fit_model.calc_distances(points)
@@ -127,12 +102,14 @@ class TestSphere:
         radius = 2.5
 
         # Generate exactly 4 points (minimal for sphere fitting)
-        points = np.array([
-            [1.0, 2.0, 5.5],  # point on sphere
-            [3.5, 2.0, 3.0],  # point on sphere
-            [1.0, 4.5, 3.0],  # point on sphere
-            [-1.5, 2.0, 3.0]   # point on sphere
-        ])
+        points = np.array(
+            [
+                [1.0, 2.0, 5.5],  # point on sphere
+                [3.5, 2.0, 3.0],  # point on sphere
+                [1.0, 4.5, 3.0],  # point on sphere
+                [-1.5, 2.0, 3.0],  # point on sphere
+            ]
+        )
 
         sphere = Sphere()
         sphere.fit_model(points)
@@ -164,41 +141,16 @@ class TestSphere:
         expected = np.array([0.0, 0.5 * radius, 0.5 * radius])
         assert np.allclose(distances, expected)
 
-    def test_benchmark_starkit_ransac(
-            self, 
-            data_points, 
-            benchmark
-        ):
+    def test_benchmark_starkit_ransac(self, data_points, benchmark):
         ransac = RANSAC(data_points)
-        benchmark(
-                ransac.fit,
-                Sphere,
-                N_ITER_BENCHMARK,
-                BENCHMARK_THRESH
-        )
+        benchmark(ransac.fit, Sphere, N_ITER_BENCHMARK, BENCHMARK_THRESH)
 
-    def test_benchmark_pyransac(
-            self, 
-            data_points, 
-            benchmark
-        ):
+    def test_benchmark_pyransac(self, data_points, benchmark):
         sphere = pyransac3d.Sphere()
-        benchmark(
-            sphere.fit,
-            data_points,
-            BENCHMARK_THRESH,
-            N_ITER_BENCHMARK
-        )
+        benchmark(sphere.fit, data_points, BENCHMARK_THRESH, N_ITER_BENCHMARK)
 
-    def test_benchmark_scuf(
-            self,
-            data_points,
-            benchmark
-        ):
-        rs = scuf.ransac.RANSAC(figure='ellipsoid')
+    def test_benchmark_scuf(self, data_points, benchmark):
+        rs = scuf.ransac.RANSAC(figure="ellipsoid")
         benchmark(
-            rs.fit,
-            data_points,
-            iterations=N_ITER_BENCHMARK,
-            threshold=BENCHMARK_THRESH
+            rs.fit, data_points, iterations=N_ITER_BENCHMARK, threshold=BENCHMARK_THRESH
         )

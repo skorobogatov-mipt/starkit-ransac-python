@@ -2,24 +2,25 @@ from starkit_ransac.surfaces.plane import Plane3D
 import numpy as np
 from starkit_ransac.utils import normalize
 
+
 def generate_plane(
-        plane:Plane3D,
-        noise_sigma=0.05,
-        n_points=1000, 
-        plane_size=10,
-        approx_center=[0,0,0]
-    ):
+    plane: Plane3D,
+    noise_sigma=0.05,
+    n_points=1000,
+    plane_size=10,
+    approx_center=[0, 0, 0],
+):
     a = plane.a
     b = plane.b
     c = plane.c
     d = plane.d
 
-    normal = np.array([a,b,c])
+    normal = np.array([a, b, c])
     normal /= np.linalg.norm(normal)
-    
+
     distance = plane.calc_distance_one_point(approx_center)
-    
-    direction = np.sign(np.dot([a,b,c], approx_center) + d)
+
+    direction = np.sign(np.dot([a, b, c], approx_center) + d)
     center = approx_center - direction * distance * normal
 
     # get some vector not parallel to a normal

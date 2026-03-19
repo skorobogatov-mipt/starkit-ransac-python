@@ -7,35 +7,27 @@ import numpy as np
 
 N_ITERATIONS = 200
 N_POINTS = 200
-N_UNIFORM_POINTS=0
+N_UNIFORM_POINTS = 0
 SEED = 42
+
 
 @pytest.fixture
 def test_generator_mobius_strip():
-    test_info_points = np.array([
-        [9, 9, 9],
-        [1, 6, 7],
-        [7, 0, 11],
-        [5, 5, 10]
-    ])
+    test_info_points = np.array([[9, 9, 9], [1, 6, 7], [7, 0, 11], [5, 5, 10]])
     test_orientation = 1
     test_mobius = MobiusStrip()
     test_mobius.fit_model(test_info_points)
     return test_mobius
 
+
 @pytest.fixture
 def point_data():
     np.random.seed(SEED)
-    test_info_points = np.array([
-        [9, 9, 9],
-        [1, 6, 7],
-        [7, 0, 11],
-        [5, 5, 10]
-    ])
+    test_info_points = np.array([[9, 9, 9], [1, 6, 7], [7, 0, 11], [5, 5, 10]])
     test_orientation = 1
     test_mobius = MobiusStrip()
     test_mobius.fit_model(test_info_points)
-    
+
     test_noise_std = 0.5
     test_box_center = test_mobius.center
     test_box_size = 10
@@ -57,7 +49,7 @@ def point_data():
     # for i in range(N_POINTS):
     #     vector_in_circle_plane = np.cos(angles[i]) * start_vector + np.sin(angles[i]) * v1
     #     p = radius * vector_in_circle_plane
-    #     half_width_vector = half_width*(vector_in_circle_plane * 
+    #     half_width_vector = half_width*(vector_in_circle_plane *
     #                                     np.cos(angles[i]*orientation/2) +
     #                                     normal*np.sin(angles[i]*orientation/2))
     #     one_end = p+half_width_vector
@@ -71,27 +63,32 @@ def point_data():
     #     size=(N_UNIFORM_POINTS, 3)
     #     )
     #     return np.vstack([mobius_points+noise, points_uniform])
-    return generate_mobius(test_mobius, test_noise_std, N_POINTS, N_UNIFORM_POINTS, test_box_center, test_box_size)
+    return generate_mobius(
+        test_mobius,
+        test_noise_std,
+        N_POINTS,
+        N_UNIFORM_POINTS,
+        test_box_center,
+        test_box_size,
+    )
+
 
 @pytest.fixture
 def acceptable_rmse():
     return 2
-    
+
+
 def test_mobius_strip(point_data, acceptable_rmse, test_generator_mobius_strip):
     runsuck = RANSAC()
     runsuck.add_points(point_data)
 
-    result = runsuck.fit(
-            MobiusStrip,
-            N_ITERATIONS,
-            0.5
-    )
+    result = runsuck.fit(MobiusStrip, N_ITERATIONS, 0.5)
     result_center = result.center
     result_radius = result.radius
     result_width = result.width
 
-    assert((np.sum((result_center - test_generator_mobius_strip.center)**2) +
-            (result_radius - test_generator_mobius_strip.radius)**2 +
-            (result_width - test_generator_mobius_strip.width)**2)
-            /5 <  acceptable_rmse)
-
+    assert (
+        np.sum((result_center - test_generator_mobius_strip.center) ** 2)
+        + (result_radius - test_generator_mobius_strip.radius) ** 2
+        + (result_width - test_generator_mobius_strip.width) ** 2
+    ) / 5 < acceptable_rmse

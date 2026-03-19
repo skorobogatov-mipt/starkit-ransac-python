@@ -3,16 +3,24 @@ from numpy.typing import ArrayLike, NDArray
 from typing import Iterable
 import numpy as np
 from starkit_ransac.abstract_surface import AbstractSurfaceModel
-from starkit_ransac.utils import line_from_2_points, lines_intersection, midpoint, normal_to_2d_line, rotate_from_axis_to_axis, rotate_rodrigues
+from starkit_ransac.utils import (
+    line_from_2_points,
+    lines_intersection,
+    midpoint,
+    normal_to_2d_line,
+    rotate_from_axis_to_axis,
+    rotate_rodrigues,
+)
 from starkit_ransac.surfaces.circle2d import Circle2D
+
 
 class Circle3D(AbstractSurfaceModel):
     def __init__(
-            self,
-            center:ArrayLike|None=None,
-            radius:float|None=None,
-            normal:ArrayLike|None=None
-        ) -> None:
+        self,
+        center: ArrayLike | None = None,
+        radius: float | None = None,
+        normal: ArrayLike | None = None,
+    ) -> None:
         if center is None:
             center = np.full(3, np.nan)
         if radius is None:
@@ -32,7 +40,7 @@ class Circle3D(AbstractSurfaceModel):
         return self._center
 
     @center.setter
-    def center(self, center:ArrayLike):
+    def center(self, center: ArrayLike):
         self._center = np.copy(center)
 
     @property
@@ -40,7 +48,7 @@ class Circle3D(AbstractSurfaceModel):
         return self._radius
 
     @radius.setter
-    def radius(self, radius:float):
+    def radius(self, radius: float):
         self._radius = float(radius)
 
     @property
@@ -48,7 +56,7 @@ class Circle3D(AbstractSurfaceModel):
         return self._normal
 
     @normal.setter
-    def normal(self, normal:ArrayLike):
+    def normal(self, normal: ArrayLike):
         if np.asarray(normal).flatten().shape != (3,):
             raise ValueError("Normal must be a vector of 3 elements")
         self._normal = np.asarray(normal) / np.linalg.norm(normal)
@@ -69,12 +77,8 @@ class Circle3D(AbstractSurfaceModel):
         self.normal = normal
 
         # 2) rotate points so that they are flat in 2d
-        rotated_points = rotate_from_axis_to_axis(
-            points,
-            normal,
-            [0, 0, 1]
-        )
-        
+        rotated_points = rotate_from_axis_to_axis(points, normal, [0, 0, 1])
+
         # 3) fit points as a 2d circle
         self.__circle2d.fit_model(rotated_points[..., :2])
         self.radius = self.__circle2d.radius
@@ -82,34 +86,30 @@ class Circle3D(AbstractSurfaceModel):
         # 4) "unrotate" the center
         rotated_center = self.__circle2d.center
         rotated_center = np.append(rotated_center, rotated_points[0, 2])
-        center = rotate_from_axis_to_axis(
-            [rotated_center],
-            [0, 0, 1],
-            normal
-        )[0]
+        center = rotate_from_axis_to_axis([rotated_center], [0, 0, 1], normal)[0]
 
         self.center = center
         return True
 
     def calc_distances(self, points: NDArray) -> NDArray:
         # 1) get the circle's plane
-        # plane equation from 
+        # plane equation from
         # normal = [A,B,C] and point=[x_p,y_p,z_p] is:
         # A*x + B*y + C*z - (A*xp + B*y_p + C*z_p) = 0
         normal = self.normal
         center = self.center
-        d = -np.sum(normal*center)
+        d = -np.sum(normal * center)
 
         # 2) get distance to plane
-        # distance from point=[x,y,z] to 
+        # distance from point=[x,y,z] to
         # plane described above is:
         # (Ax + By + Cz + d)/sqrt(A^2 + B^2 + C^2)
-        plane_distances = (np.sum(points*normal, axis=-1) + d)
+        plane_distances = np.sum(points * normal, axis=-1) + d
         plane_distances = plane_distances / np.linalg.norm(normal)
-        
+
         # 3) get distance to a cylinder instead of circle
         radius = self.radius
-        cyl_distances = np.cross(normal, points-center)
+        cyl_distances = np.cross(normal, points - center)
         cyl_distances = np.linalg.norm(cyl_distances, axis=-1) - radius
 
         # 4) get actual distance
@@ -119,8 +119,8 @@ class Circle3D(AbstractSurfaceModel):
         return self.calc_distances(np.array([point]))[0]
 
     def __repr__(self):
-        res = ''
-        res += 'radius: ' + str(self.radius) + '\n'
-        res += 'center: ' + str(self.center) + '\n'
-        res += 'normal: ' + str(self.normal) + '\n'
+        res = ""
+        res += "radius: " + str(self.radius) + "\n"
+        res += "center: " + str(self.center) + "\n"
+        res += "normal: " + str(self.normal) + "\n"
         return res

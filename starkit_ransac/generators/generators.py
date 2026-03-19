@@ -3,13 +3,8 @@ from numpy.typing import NDArray
 
 
 def generate_cylindrical_ring(
-        inner_r,
-        outer_r,
-        height,
-        center,
-        n_points=1000,
-        seed:int=42
-    ):
+    inner_r, outer_r, height, center, n_points=1000, seed: int = 42
+):
     np.random.seed(seed)
     points = []
     for _ in range(n_points):
@@ -23,6 +18,7 @@ def generate_cylindrical_ring(
         points.append([x, y, z])
 
     return np.array(points)
+
 
 def generate_stairs(
     n_steps: int,
@@ -65,11 +61,8 @@ def generate_stairs(
 
     return cloud
 
-def generate_ellipsoid_data(
-        center,
-        radii,
-        rpy
-    ):
+
+def generate_ellipsoid_data(center, radii, rpy):
     """Создает тестовые данные эллипсоида со случайными параметрами."""
 
     # Случайные параметры эллипсоида
@@ -78,15 +71,27 @@ def generate_ellipsoid_data(
 
     # Случайные углы вращения
     angles = np.random.uniform(0, 2 * np.pi, 3)
-    Rx = np.array([[1, 0, 0],
-                   [0, np.cos(angles[0]), -np.sin(angles[0])],
-                   [0, np.sin(angles[0]), np.cos(angles[0])]])
-    Ry = np.array([[np.cos(angles[1]), 0, np.sin(angles[1])],
-                   [0, 1, 0],
-                   [-np.sin(angles[1]), 0, np.cos(angles[1])]])
-    Rz = np.array([[np.cos(angles[2]), -np.sin(angles[2]), 0],
-                   [np.sin(angles[2]), np.cos(angles[2]), 0],
-                   [0, 0, 1]])
+    Rx = np.array(
+        [
+            [1, 0, 0],
+            [0, np.cos(angles[0]), -np.sin(angles[0])],
+            [0, np.sin(angles[0]), np.cos(angles[0])],
+        ]
+    )
+    Ry = np.array(
+        [
+            [np.cos(angles[1]), 0, np.sin(angles[1])],
+            [0, 1, 0],
+            [-np.sin(angles[1]), 0, np.cos(angles[1])],
+        ]
+    )
+    Rz = np.array(
+        [
+            [np.cos(angles[2]), -np.sin(angles[2]), 0],
+            [np.sin(angles[2]), np.cos(angles[2]), 0],
+            [0, 0, 1],
+        ]
+    )
     true_rotation = Rz @ Ry @ Rx
 
     points = []
@@ -119,9 +124,9 @@ def generate_ellipsoid_data(
     data = np.array(points)
 
     return {
-        'data': data,
-        'true_center': true_center,
-        'true_radii': true_radii,
-        'true_rotation': true_rotation,
-        'n_inliers': n_inliers
+        "data": data,
+        "true_center": true_center,
+        "true_radii": true_radii,
+        "true_rotation": true_rotation,
+        "n_inliers": n_inliers,
     }

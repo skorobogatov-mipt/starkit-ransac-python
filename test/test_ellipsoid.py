@@ -11,6 +11,7 @@ from starkit_ransac.utils import normalize
 import scuf
 import pyransac3d
 
+
 class TestEllipsoid3D:
     # numbers of variants of a parameter
     N_CENTERS = 5
@@ -18,24 +19,19 @@ class TestEllipsoid3D:
     N_NORMALS = 5
 
     MAX_OFFSET = 20
-    centers_list = (
-        RNG.random((N_CENTERS, 3)) * MAX_OFFSET
-    ).tolist()
+    centers_list = (RNG.random((N_CENTERS, 3)) * MAX_OFFSET).tolist()
 
     MAX_RADIUS = 5
-    radii_list = (
-        np.abs(RNG.random((N_RADII, 3)) * MAX_RADIUS)
-    ).tolist()
+    radii_list = (np.abs(RNG.random((N_RADII, 3)) * MAX_RADIUS)).tolist()
 
-    axes_list = RNG.random((N_NORMALS,3,3))
+    axes_list = RNG.random((N_NORMALS, 3, 3))
     # make sure that the third normal is perpendicular to the first two
     axes_list[:, 2] = np.cross(axes_list[:, 0], axes_list[:, 1])
     # make sure that the firs normal is orthogonal to the second two axes_list[:, 0] = np.cross(axes_list[:, 1], axes_list[:, 2])
     axes_list[:, 1] = np.cross(axes_list[:, 2], axes_list[:, 0])
     axes_list = normalize(axes_list, axis=-1).tolist()
 
-
-    @pytest.fixture(scope='class', params=centers_list)
+    @pytest.fixture(scope="class", params=centers_list)
     def center(self, request):
         return np.array(request.param)
 
@@ -47,45 +43,28 @@ class TestEllipsoid3D:
     def axes(self, request):
         return request.param
 
-    @pytest.fixture(scope='class')
-    def perfect_model(
-            self,
-            axes,
-            radii,
-            center
-        ):
+    @pytest.fixture(scope="class")
+    def perfect_model(self, axes, radii, center):
         return Ellipsoid3D(axes, radii, center)
 
-    @pytest.fixture(
-            scope='class', 
-            params=[0., 0.01, 0.02, 0.05, 0.1]
-    )
+    @pytest.fixture(scope="class", params=[0.0, 0.01, 0.02, 0.05, 0.1])
     def noise_sigma(self, request):
         return request.param
 
-    @pytest.fixture(
-            scope='class', 
-            params=[5000, 2500, 1000, 500]
-    )
+    @pytest.fixture(scope="class", params=[5000, 2500, 1000, 500])
     def n_points(self, request):
         return request.param
 
-    @pytest.fixture(scope='class')
+    @pytest.fixture(scope="class")
     def data_points(self, perfect_model, noise_sigma, n_points):
         return generate_ellipsoid(
-            perfect_model,
-            noise_sigma=noise_sigma,
-            n_points=n_points
+            perfect_model, noise_sigma=noise_sigma, n_points=n_points
         )
 
-    @pytest.fixture(scope='class')
+    @pytest.fixture(scope="class")
     def fit_model(self, data_points):
         rasnsac = RANSAC(data_points)
-        model = rasnsac.fit(
-            Ellipsoid3D,
-            10000,
-            0.1
-        )
+        model = rasnsac.fit(Ellipsoid3D, 10000, 0.1)
 
         return model
 
@@ -105,10 +84,12 @@ class TestEllipsoid3D:
     def acceptable_center_distance(self):
         return 0.25
 
-    def test_polynomial_are_close(self, fit_model, perfect_model, acceptable_polynomial_relative_error):
+    def test_polynomial_are_close(
+        self, fit_model, perfect_model, acceptable_polynomial_relative_error
+    ):
         actual = perfect_model.polynomial
         fit = fit_model.polynomial
-        diffs = np.abs((actual - fit))/actual
+        diffs = np.abs((actual - fit)) / actual
         assert (diffs < acceptable_polynomial_relative_error).all()
 
     def test_axes_are_close(self, fit_model, perfect_model, acceptable_axes_rmse):
@@ -122,12 +103,14 @@ class TestEllipsoid3D:
             pos_diff = np.linalg.norm(ax_fit - ax_axtual)
             neg_diff = np.linalg.norm(ax_fit + ax_axtual)
             diffs.append(min(pos_diff, neg_diff))
-            
+
         # if np.linalg.norm(diffs) > 1:
         #     pdb.set_trace()
         assert np.linalg.norm(diffs) < acceptable_axes_rmse
 
-    def test_radii_are_close(self, fit_model, perfect_model, acceptable_radii_relative_error):
+    def test_radii_are_close(
+        self, fit_model, perfect_model, acceptable_radii_relative_error
+    ):
         actual = perfect_model.radii
         fit = fit_model.radii
 
@@ -139,11 +122,8 @@ class TestEllipsoid3D:
         assert (diffs < acceptable_radii_relative_error).all()
 
     def test_centers_are_close(
-            self, 
-            fit_model, 
-            perfect_model, 
-            acceptable_center_distance
-        ):
+        self, fit_model, perfect_model, acceptable_center_distance
+    ):
         actual = perfect_model.center
         fit = fit_model.center
         diffs = actual - fit
@@ -153,41 +133,20 @@ class TestEllipsoid3D:
     def acceptable_point_rmse(self):
         return 0.5
 
-
     def test_overall_close(
-            self,
-            perfect_model:Ellipsoid3D,
-            fit_model:Ellipsoid3D,
-            acceptable_point_rmse
-        ):
+        self, perfect_model: Ellipsoid3D, fit_model: Ellipsoid3D, acceptable_point_rmse
+    ):
         perfect_points = generate_ellipsoid(perfect_model, n_points=5000, noise_sigma=0)
         distances = fit_model.calc_distances(perfect_points)
         rmse = np.sqrt(np.mean(distances**2))
         assert rmse < acceptable_point_rmse
 
-    def test_benchmark_starkit_ransac(
-            self,
-            data_points,
-            benchmark
-        ):
+    def test_benchmark_starkit_ransac(self, data_points, benchmark):
         ransac = RANSAC(data_points)
-        benchmark(
-            ransac.fit,
-            Ellipsoid3D,
-            N_ITER_BENCHMARK,
-            BENCHMARK_THRESH
-        )
+        benchmark(ransac.fit, Ellipsoid3D, N_ITER_BENCHMARK, BENCHMARK_THRESH)
 
-    def test_benchmark_scuf(
-            self,
-            data_points,
-            benchmark
-        ):
+    def test_benchmark_scuf(self, data_points, benchmark):
         IS = scuf.ransac.RANSAC(figure="ellipsoid")
         result = benchmark(
-                IS.fit,
-                data_points,
-                iterations=N_ITER_BENCHMARK,
-                threshold=BENCHMARK_THRESH
+            IS.fit, data_points, iterations=N_ITER_BENCHMARK, threshold=BENCHMARK_THRESH
         )
-

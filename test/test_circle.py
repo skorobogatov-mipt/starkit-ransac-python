@@ -4,21 +4,18 @@ import pytest
 from starkit_ransac.generators.circle import generate_circle
 from starkit_ransac.surfaces.circle import Circle3D
 from starkit_ransac.ransac_3d import RANSAC
-from conftest import BENCHMARK_THRESH, N_ITER_BENCHMARK, SEED,RNG
+from conftest import BENCHMARK_THRESH, N_ITER_BENCHMARK, SEED, RNG
 from pytest_benchmark.plugin import benchmark
+
 
 class TestCircle3D:
     MAX_OFFSET = 20
-    center_coordinates = (
-        RNG.random((5, 3)) * MAX_OFFSET
-    ).tolist()
+    center_coordinates = (RNG.random((5, 3)) * MAX_OFFSET).tolist()
 
     normals = RNG.random((5, 3)).tolist()
 
     MAX_RADIUS = 5
-    radii = (
-        RNG.random(5) * MAX_RADIUS
-    ).tolist()
+    radii = (RNG.random(5) * MAX_RADIUS).tolist()
 
     @pytest.fixture(scope="class", params=center_coordinates)
     def center(self, request):
@@ -34,11 +31,7 @@ class TestCircle3D:
 
     @pytest.fixture(scope="class")
     def perfect_circle(self, center, radius, normal):
-        return Circle3D(
-            center=center,
-            radius=radius,
-            normal=normal
-        )
+        return Circle3D(center=center, radius=radius, normal=normal)
 
     @pytest.fixture(scope="class", params=[0, 0.05, 0.1, 0.5])
     def noise_sigma(self, request):
@@ -51,9 +44,7 @@ class TestCircle3D:
     @pytest.fixture(scope="class")
     def circle_data(self, perfect_circle, noise_sigma, n_points):
         data = generate_circle(
-            perfect_circle,
-            noise_sigma=noise_sigma,
-            n_points=n_points
+            perfect_circle, noise_sigma=noise_sigma, n_points=n_points
         )
         return data
 
@@ -62,11 +53,7 @@ class TestCircle3D:
         ransac = RANSAC()
         ransac.add_points(circle_data)
 
-        model = ransac.fit(
-            Circle3D,
-            500,
-            0.1
-        )
+        model = ransac.fit(Circle3D, 500, 0.1)
         return model
 
     @pytest.fixture(scope="class")
@@ -82,10 +69,7 @@ class TestCircle3D:
         return 0.1
 
     def test_radii_are_close(
-        self,
-        fitted_circle,
-        perfect_circle,
-        acceptable_radius_error
+        self, fitted_circle, perfect_circle, acceptable_radius_error
     ):
         fit_radius = fitted_circle.radius
         actual_radius = perfect_circle.radius
@@ -93,10 +77,7 @@ class TestCircle3D:
         assert relative_radius_error < acceptable_radius_error
 
     def test_normals_are_close(
-        self,
-        fitted_circle,
-        perfect_circle,
-        acceptable_normal_error
+        self, fitted_circle, perfect_circle, acceptable_normal_error
     ):
         fit_normal = fitted_circle.normal
         actual_normal = perfect_circle.normal
@@ -105,10 +86,7 @@ class TestCircle3D:
         assert min(dist1, dist2) < acceptable_normal_error
 
     def test_centers_are_close(
-        self,
-        fitted_circle,
-        perfect_circle,
-        acceptable_center_error
+        self, fitted_circle, perfect_circle, acceptable_center_error
     ):
         fit_center = fitted_circle.center
         actual_center = perfect_circle.center
@@ -117,19 +95,8 @@ class TestCircle3D:
 
     def test_benchmark_starkit_ransac(self, circle_data, benchmark):
         ransac = RANSAC(circle_data)
-        benchmark(
-            ransac.fit,
-            Circle3D,
-            N_ITER_BENCHMARK,
-            BENCHMARK_THRESH
-        )
+        benchmark(ransac.fit, Circle3D, N_ITER_BENCHMARK, BENCHMARK_THRESH)
 
     def test_benchmark_pyransac(self, circle_data, benchmark):
         circle = pyransac3d.circle.Circle()
-        benchmark(
-            circle.fit,
-            circle_data,
-            BENCHMARK_THRESH,
-            N_ITER_BENCHMARK
-        )
-
+        benchmark(circle.fit, circle_data, BENCHMARK_THRESH, N_ITER_BENCHMARK)
