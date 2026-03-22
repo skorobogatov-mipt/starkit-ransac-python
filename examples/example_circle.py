@@ -14,7 +14,7 @@ def main():
     perfect_model = Circle3D(np.random.random(3) * 20, 5.5, np.random.random(3))
     data = generate_circle(
         perfect_model,
-        1.5,
+        1.1,
         6000,
     )
 
@@ -37,7 +37,10 @@ def main():
     #         point_size=2
     # )
 
-    draw_pretty([mesh, pcd])
+    draw_pretty(
+        [mesh, pcd],
+        filename='./figures/circle3d.png'
+    )
 
 
 if __name__ == "__main__":

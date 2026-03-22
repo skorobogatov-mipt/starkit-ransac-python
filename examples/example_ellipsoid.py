@@ -37,7 +37,11 @@ def main():
     pcd.points = o3d.utility.Vector3dVector(data)
     pcd.paint_uniform_color([0.9, 0.9, 0.9])
 
-    draw_pretty([fitted_mesh, pcd])
+    draw_pretty(
+            [fitted_mesh, pcd],
+            line_width=4,
+            filename='./figures/ellipsoid.png'
+    )
 
 
 if __name__ == "__main__":

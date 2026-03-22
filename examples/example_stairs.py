@@ -29,10 +29,10 @@ def main():
         n_steps=5,
         step_height=0.3,
         step_width=0.5,
-        stair_span=2,
+        stair_span=1.5,
         n_points=1000,
         rotation_deg=30,
-        noise_sigma=0.05,
+        noise_sigma=0.01,
     )
     ransac = RANSAC()
     ransac.add_points(data)
@@ -42,7 +42,10 @@ def main():
     pcd.points = o3d.utility.Vector3dVector(data)
     pcd.paint_uniform_color([0.7] * 3)
 
-    draw_pretty([mesh, pcd], point_size=5)
+    draw_pretty(
+        [mesh, pcd], 
+        filename='./figures/stairs.png'
+    )
     # visualize_stairs(data, model)
 
 

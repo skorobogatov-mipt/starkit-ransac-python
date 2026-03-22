@@ -54,7 +54,6 @@ class Plane3D(AbstractSurfaceModel):
         return True
 
     def calc_distances(self, points: NDArray) -> NDArray:
-
         norm = np.linalg.norm(self.coeffs[:3])
         return np.abs((points @ self.coeffs[:3] + self.d)) / norm
 

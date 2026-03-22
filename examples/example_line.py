@@ -13,13 +13,17 @@ def main():
     ransac = RANSAC(data)
     model = ransac.fit(object_type=Line3D, iter_num=100, distance_threshold=0.1)
 
-    mesh = generate_line3d_mesh(model, length=20)
+    avg = np.mean(data, axis=0)
+    mesh = generate_line3d_mesh(model, length=7, midpoint=avg)
 
     pcd = o3d.geometry.PointCloud()
     pcd.points = o3d.utility.Vector3dVector(data)
     pcd.paint_uniform_color([0.9, 0.9, 0.9])
 
-    draw_pretty([mesh, pcd])
+    draw_pretty(
+        [mesh, pcd],
+        filename='./figures/line3d.png'
+    )
 
 
 if __name__ == "__main__":

@@ -25,7 +25,10 @@ def main():
     pcd.points = o3d.utility.Vector3dVector(data)
     pcd.paint_uniform_color([0.9] * 3)
 
-    draw_pretty([mesh, pcd], point_size=7)
+    draw_pretty(
+        [mesh, pcd], 
+        filename='./figures/sphere.png'
+    )
 
 
 if __name__ == "__main__":

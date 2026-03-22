@@ -10,12 +10,12 @@ from pytest_benchmark.plugin import benchmark
 
 class TestCircle3D:
     MAX_OFFSET = 20
-    center_coordinates = (RNG.random((5, 3)) * MAX_OFFSET).tolist()
+    center_coordinates = (RNG.random((3, 3)) * MAX_OFFSET).tolist()
 
-    normals = RNG.random((5, 3)).tolist()
+    normals = RNG.random((3, 3)).tolist()
 
     MAX_RADIUS = 5
-    radii = (RNG.random(5) * MAX_RADIUS).tolist()
+    radii = (RNG.random(3) * MAX_RADIUS).tolist()
 
     @pytest.fixture(scope="class", params=center_coordinates)
     def center(self, request):

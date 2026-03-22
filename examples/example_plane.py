@@ -25,7 +25,10 @@ def main():
     pcd.points = o3d.utility.Vector3dVector(data)
     pcd.paint_uniform_color([0.9, 0.3, 0.9])
 
-    draw_pretty([pcd, mesh], point_size=5)
+    draw_pretty(
+        [pcd, mesh], 
+        filename='./figures/plane.png'
+    )
 
 
 if __name__ == "__main__":

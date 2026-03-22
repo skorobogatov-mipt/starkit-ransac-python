@@ -147,6 +147,6 @@ class TestEllipsoid3D:
 
     def test_benchmark_scuf(self, data_points, benchmark):
         IS = scuf.ransac.RANSAC(figure="ellipsoid")
-        result = benchmark(
+        benchmark(
             IS.fit, data_points, iterations=N_ITER_BENCHMARK, threshold=BENCHMARK_THRESH
         )

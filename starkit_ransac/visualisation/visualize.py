@@ -40,23 +40,34 @@ def generate_mesh(surface, resolution=100, color=(0, 1, 0)):
     return func(surface, resolution=resolution, color=color)
 
 
-def setup_visualizer(winname="RASNAC"):
+def setup_visualizer(winname="RASNAC", line_width=7, point_size=2): 
     o3d.visualization.gui.Application.instance.initialize()
-    vis = o3d.visualization.O3DVisualizer(winname, 1024, 768)
+    vis = o3d.visualization.O3DVisualizer(winname, 480, 480)
     color = np.full(4, 0.2)
     color[-1] = 1
     vis.set_background(color, None)
     vis.show_skybox(False)
-    vis.line_width = 15
+    vis.line_width = line_width
+    vis.point_size = point_size
     vis.setup_camera(80, [0, 0, 0], [15, 0, 0], [0, 0, 1])
     return vis
 
+def draw_pretty(
+        geom, 
+        line_width=5, 
+        point_size=2,
+        save=True,
+        filename='ransac.png'
+    ):
+    viz = setup_visualizer(line_width=line_width, point_size=point_size)
+    id = 0
+    for shape in geom:
+        viz.add_geometry('geom_'+str(id), shape)
+        id += 1
 
-def draw_pretty(geom, line_width=7, point_size=2):
-    o3d.visualization.draw(
-        geom,
-        bg_color=(0.2, 0.2, 0.2, 1),
-        show_skybox=False,
-        line_width=line_width,
-        point_size=point_size,
-    )
+    viz.reset_camera_to_default()
+    viz.post_redraw()
+    if save:
+        o3d.visualization.gui.Application.instance.run_one_tick()    
+        viz.export_current_image(filename)
+    o3d.visualization.gui.Application.instance.run()    

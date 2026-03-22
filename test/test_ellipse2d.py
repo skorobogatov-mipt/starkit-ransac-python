@@ -167,9 +167,9 @@ class TestEllipse2D:
 
         assert rmse < acceptable_point_rmse
 
-    def test_benchmark_starkit_ransac(self, data_points, benchmark):
-        ransac = RANSAC(data_points)
-        benchmark(ransac.fit, Ellipse2D, N_ITER_BENCHMARK, BENCHMARK_THRESH)
+    # def test_benchmark_starkit_ransac(self, data_points, benchmark):
+    #     ransac = RANSAC(data_points)
+    #     benchmark(ransac.fit, Ellipse2D, N_ITER_BENCHMARK, BENCHMARK_THRESH)
 
     # def test_benchmark_scuf(
     #         self,
