@@ -93,7 +93,6 @@ class RANSAC:
         # )
         # indices = np.argpartition(random_matrix, self.model.num_samples, axis=1)[:, :self.model.num_samples]
         indices = np.random.randint(0, n_data, (iter_num, self.model.num_samples))
-        n_models = 0
         for idx in indices:
 
             if len(np.unique(idx)) != self.model.num_samples:
@@ -103,7 +102,6 @@ class RANSAC:
 
             sample = self.__data[idx]
             success = self.model.fit_model(sample)
-            n_models += 1
             if not success:
                 continue
 

@@ -11,7 +11,7 @@ from starkit_ransac.visualisation.visualize import (
 
 
 def main():
-    perfect_sphere = Sphere([1, 2, 3], 6.9)
+    perfect_sphere = Sphere([5, -9, 3], 6.9)
     data = generate_sphere(perfect_sphere, noise_sigma=0.1, n_points=1000)
     ransac = RANSAC(data)
     model = ransac.fit(Sphere, 10, 0.05)
@@ -27,6 +27,7 @@ def main():
 
     draw_pretty(
         [mesh, pcd], 
+        point_size=7,
         filename='./figures/sphere.png'
     )
 

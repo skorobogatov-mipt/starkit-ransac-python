@@ -67,12 +67,11 @@ def main():
         benchmark_data = json.load(inp)
 
     target_tests = [
-        "circle",
         "line",
-        "sphere",
         "plane",
-        "ellipsoid",
+        "circle",
         "sphere",
+        "ellipsoid",
     ]
     target_libraries = [
         "starkit_ransac",
@@ -115,46 +114,27 @@ def main():
             
             avgs[lib][test] = total_time[lib][test] / n_iter[lib][test]
 
-    w = 0.4
-    #  1) create comparison for pyransac
+    n_spaces = 15
+    print(' '*n_spaces, end='')
+    for shape in target_tests:
+        print(shape, end='    ')
+    print('\n', end='')
+
+    for lib in target_libraries:
+        print(lib, end='')
+        print(' '*(n_spaces - len(lib)), end='')
+        for shape in target_tests:
+            if shape in avgs[lib].keys():
+                to_print = format(avgs[lib][shape], '.4f')
+                print(to_print, end=' '*(4 + len(shape) - len(to_print)))
+            else:
+                print('-'*len(shape), end='    ')
+            # print(' ', end='')
+
+        print('')
+
     plot_comparison('starkit_ransac', 'pyransac', avgs)
     plot_comparison('starkit_ransac', 'scuf', avgs)
-    # pyransac_shapes = list(avgs['pyransac'].keys())
-    # n_shapes_pyransac = len(pyransac_shapes)
-    # pyransac_bar = np.arange(n_shapes_pyransac) + w
-    # stransac_bar = pyransac_bar - w
-    #
-    # starkit_ransac_avgs = []
-    # for shape in pyransac_shapes:
-    #     starkit_ransac_avgs.append(avgs["starkit_ransac"][shape])
-    #
-    # plt.bar(stransac_bar, starkit_ransac_avgs, w, label="starkit_ransac")
-    # plt.bar(pyransac_bar, avgs['pyransac'].values(), w, label="pyransac")
-    # plt.xticks(pyransac_bar + w / 2, pyransac_shapes, fontsize=24)
-    # plt.yticks(fontsize=24)
-    # plt.ylabel("Time per iteration, s", fontsize=32)
-    # plt.xlabel("Shapes", fontsize=32)
-    # plt.legend(fontsize=32)
-    # plt.show()
-
-    # 2) create comparison for scuf
-    # scuf_shapes = list(avgs['scuf'].keys())
-    # n_shapes_scuf = len(scuf_shapes)
-    # pyransac_bar = np.arange(n_shapes_pyransac) + w
-    # stransac_bar = pyransac_bar - w
-    #
-    # starkit_ransac_avgs = []
-    # for shape in pyransac_shapes:
-    #     starkit_ransac_avgs.append(avgs["starkit_ransac"][shape])
-    #
-    # plt.bar(stransac_bar, starkit_ransac_avgs, w, label="starkit_ransac")
-    # plt.bar(pyransac_bar, avgs['pyransac'].values(), w, label="pyransac")
-    # plt.xticks(pyransac_bar + w / 2, pyransac_shapes, fontsize=24)
-    # plt.yticks(fontsize=24)
-    # plt.ylabel("Time per iteration, s", fontsize=32)
-    # plt.xlabel("Shapes", fontsize=32)
-    # plt.legend(fontsize=32)
-    # plt.show()
 
 
 
