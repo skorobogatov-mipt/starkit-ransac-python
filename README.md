@@ -1,68 +1,99 @@
-# About this library
-This is an open source implementation of most common objects for python.
+# starkit-ransac
 
-# Requirements
-This repo was written on python 3.12. It should work fine with some other
-versions too, though.
+A Python library for fitting geometric models to noisy point clouds using the [RANSAC](https://en.wikipedia.org/wiki/Random_sample_consensus) (Random Sample Consensus) algorithm.
 
-To install requirements, run:
-```
+## Supported Models
+
+| Model | Dimensions | Min. samples |
+|-------|-----------|--------------|
+| Point | 3D | 1 |
+| Line | 3D | 2 |
+| Plane | 3D | 3 |
+| Circle | 2D, 3D | 3 |
+| Sphere | 3D | 4 |
+| Ellipse | 2D | 5 |
+| Ellipsoid | 3D | 9 |
+| Mobius Strip | 3D | 4 |
+| Staircase | 3D | 90 |
+
+## Installation
+
+```bash
 pip install -r requirements.txt
-```
-
-To install this module during development:
-```
 pip install -e .
 ```
 
-# Modules
-## Surfaces
-This module represents all the surfaces included in this library.
-In each file, there's a class that encapsulates one surface e.g. Cylinder,
-Ellipsoid etc.
+Requires Python 3.12+. Core dependency: `numpy >= 1.23.5, < 2`. Optional: `open3d` for visualization.
 
-## Generators
-This module contains all the generation functions for surfaces provided in
-this library.
-In each file, there's a function like: 
-```
-generate_cylinder(cylinder:Cylinder, noise_sigma, n_points)
-```
-that generates a set of 3d points for a given model.
+## Quick Start
 
-## Visualization
-This module contains mesh generators for each surface. For example, here's a
-generation function for a cylinder:
-```
-from starkit_ransac.surfaces.cylinder import Cylinder
-generate_cylinder_mesh(cylinder:Cylinder, color=...)
-```
-Each generation function accepts a surface model.
-That creates an array of objects that can be visualized via
-`open3d.visualization.draw_geometries`.
+```python
+import numpy as np
+from starkit_ransac.surfaces.sphere import Sphere
+from starkit_ransac.generators.sphere import generate_sphere
+from starkit_ransac.ransac_3d import RANSAC
+from starkit_ransac.visualisation.visualize import generate_mesh, draw_pretty
+import open3d as o3d
 
-# Writing your modules
-To write a custom surface detector, create a child class of SurfaceModel and
-place it in `ransac3d/surfaces/`. An example can be found at
-`ransac3d/surfaces/point.py`.
+# 1. Generate a noisy point cloud around a sphere
+true_model = Sphere(center=np.array([1.0, 2.0, 3.0]), radius=5.0)
+points = generate_sphere(true_model, noise_sigma=0.1, n_points=1000)
 
-# Testing
-To test your module, please write a pytest file for it. Example can be found in
-`test/test_point.py`. 
+# 2. Fit with RANSAC
+ransac = RANSAC(points)
+fitted = ransac.fit(Sphere, iter_num=1000, distance_threshold=0.05)
 
-To run your tests:
-```
-python -m pytest test/<your_test_file_name>
+print(fitted.model)  # {'center': array([...]), 'radius': ...}
+
+# 3. Visualize
+pcd = o3d.geometry.PointCloud()
+pcd.points = o3d.utility.Vector3dVector(points)
+mesh = generate_mesh(fitted, color=[0, 1, 0])
+draw_pretty([mesh, pcd])
 ```
 
-# Contributing
-To add you custom surface to this repo:
-1) Clone this repo
-2) Create a brahcn called `feature/<your_shape_name>`
-3) Write tests. Make sure that they pass.
-4) Create a pull request.
+More examples for every supported model are in the [`examples/`](examples/) directory.
 
-## Codestyle
-If you want to contribute to this library, make sure that your code adheres to the following code style:
-* classes are written in `EachWordStartingWithACapitalLetter` style
-* functions and variables are written in `snake_case`
+## Library Structure
+
+```
+starkit_ransac/
+├── ransac_3d.py            # RANSAC algorithm
+├── abstract_surface.py     # Base class for all models
+├── surfaces/               # Geometric model classes
+├── generators/             # Noisy point cloud generators
+└── visualisation/          # Open3D mesh generation and drawing
+```
+
+**`RANSAC`** is the main entry point. Call `.fit(ModelClass, iter_num, distance_threshold)` to run the algorithm. Each model class inherits from `AbstractSurfaceModel` and implements:
+
+- `fit_model(points)` — fit the model to a minimal sample
+- `calc_distances(points)` — compute distances from all points to the surface
+- `num_samples` — number of points needed to define the model
+
+## Adding a Custom Model
+
+1. Create a class inheriting from `AbstractSurfaceModel` in `starkit_ransac/surfaces/`.
+2. Implement `fit_model`, `calc_distances`, `calc_distance_one_point`, and the `num_samples` / `model` properties.
+3. (Optional) Add a generator in `generators/` and a mesh generator in `visualisation/`.
+
+See [`starkit_ransac/surfaces/point.py`](starkit_ransac/surfaces/point.py) for a minimal example.
+
+## Testing
+
+```bash
+python -m pytest test/
+```
+
+## Contributing
+
+1. Clone the repo
+2. Create a branch: `feature/<your_shape_name>`
+3. Write tests (see `test/test_point.py` for reference) and make sure they pass
+4. Open a pull request
+
+Code style: `PascalCase` for classes, `snake_case` for functions and variables.
+
+## License
+
+MIT

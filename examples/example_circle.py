@@ -13,9 +13,9 @@ from starkit_ransac.visualisation.visualize import (
 def main():
     perfect_model = Circle3D(np.random.random(3) * 20, 5.5, np.random.random(3))
     data = generate_circle(
-        perfect_model,
-        1.1,
-        6000,
+            perfect_model,
+            0.5,
+            6000,
     )
 
     ransac = RANSAC()
