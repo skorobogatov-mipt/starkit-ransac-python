@@ -27,7 +27,8 @@ class TestEllipsoid3D:
     axes_list = RNG.random((N_NORMALS, 3, 3))
     # make sure that the third normal is perpendicular to the first two
     axes_list[:, 2] = np.cross(axes_list[:, 0], axes_list[:, 1])
-    # make sure that the firs normal is orthogonal to the second two axes_list[:, 0] = np.cross(axes_list[:, 1], axes_list[:, 2])
+    # make sure that the firs normal is orthogonal to the second two 
+    axes_list[:, 0] = np.cross(axes_list[:, 1], axes_list[:, 2])
     axes_list[:, 1] = np.cross(axes_list[:, 2], axes_list[:, 0])
     axes_list = normalize(axes_list, axis=-1).tolist()
 
