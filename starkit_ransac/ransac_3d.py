@@ -1,13 +1,8 @@
-import open3d as o3d
-import pdb
-from starkit_ransac.generators.ellipsoid import generate_ellipsoid
-from time import sleep
 import numpy as np
 from numpy.typing import NDArray
 from starkit_ransac.abstract_surface import AbstractSurfaceModel
 from copy import deepcopy
 
-from starkit_ransac.visualisation.visualize import generate_mesh, setup_visualizer
 
 
 class RANSAC:
