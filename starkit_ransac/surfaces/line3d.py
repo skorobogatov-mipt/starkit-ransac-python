@@ -24,7 +24,7 @@ class Line3D(AbstractSurfaceModel):
         self.point = points[0] + np.dot(points[0], self.direction) * self.direction
         return True
 
-    def calc_distances(self, points: NDArray, non_squared=False) -> NDArray:
+    def calc_distances(self, points: NDArray) -> NDArray:
         a = self.point
 
         distances = (a - points) - np.outer(
