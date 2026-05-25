@@ -4,58 +4,14 @@ import pytest
 from starkit_ransac.generators.circle import generate_circle
 from starkit_ransac.surfaces.circle import Circle3D
 from starkit_ransac.ransac_3d import RANSAC
-from conftest import BENCHMARK_THRESH, N_ITER_BENCHMARK, SEED, RNG
+from conftest import BENCHMARK_THRESH, N_ITER_BENCHMARK, SEED, RNG, AbstractTestPrecision
 from pytest_benchmark.plugin import benchmark
 
+from circle3d_generator import Circle3DGenerator
 
-class TestCircle3D:
-    MAX_OFFSET = 20
-    center_coordinates = (RNG.random((3, 3)) * MAX_OFFSET).tolist()
+from pyransac3d import Circle
 
-    normals = RNG.random((3, 3)).tolist()
-
-    MAX_RADIUS = 5
-    radii = (RNG.random(3) * MAX_RADIUS).tolist()
-
-    @pytest.fixture(scope="class", params=center_coordinates)
-    def center(self, request):
-        return np.array(request.param)
-
-    @pytest.fixture(scope="class", params=radii)
-    def radius(self, request):
-        return request.param
-
-    @pytest.fixture(scope="class", params=normals)
-    def normal(self, request):
-        return request.param
-
-    @pytest.fixture(scope="class")
-    def perfect_circle(self, center, radius, normal):
-        return Circle3D(center=center, radius=radius, normal=normal)
-
-    @pytest.fixture(scope="class", params=[0, 0.05, 0.1, 0.5])
-    def noise_sigma(self, request):
-        return request.param
-
-    @pytest.fixture(scope="class", params=[1000, 500, 250])
-    def n_points(self, request):
-        return request.param
-
-    @pytest.fixture(scope="class")
-    def circle_data(self, perfect_circle, noise_sigma, n_points):
-        data = generate_circle(
-            perfect_circle, noise_sigma=noise_sigma, n_points=n_points
-        )
-        return data
-
-    @pytest.fixture(scope="class")
-    def fitted_circle(self, circle_data):
-        ransac = RANSAC()
-        ransac.add_points(circle_data)
-
-        model = ransac.fit(Circle3D, 500, 0.1)
-        return model
-
+class TestCircle3D(Circle3DGenerator):
     @pytest.fixture(scope="class")
     def acceptable_radius_error(self):
         return 0.05
@@ -93,6 +49,9 @@ class TestCircle3D:
         dist = np.linalg.norm(fit_center - actual_center)
         assert dist < acceptable_center_error
 
+
+class TestBenchmarkCircle3D(Circle3DGenerator):
+
     def test_benchmark_starkit_ransac(self, circle_data, benchmark):
         ransac = RANSAC(circle_data)
         benchmark(ransac.fit, Circle3D, N_ITER_BENCHMARK, BENCHMARK_THRESH)
@@ -100,3 +59,37 @@ class TestCircle3D:
     def test_benchmark_pyransac(self, circle_data, benchmark):
         circle = pyransac3d.circle.Circle()
         benchmark(circle.fit, circle_data, BENCHMARK_THRESH, N_ITER_BENCHMARK)
+
+# class TestPrecisionCircle3D(Circle3DGenerator, AbstractTestPrecision):
+#
+#     def test_compare_rmse(self, perfect_model, data_points, n_iter):
+#         all_stransac_distances = 0
+#         all_pyransac_distances = 0
+#         perfect_data = generate_circle(perfect_model, 0, 1000)
+#         pyransac_circle = Circle()
+#         for i in range(self.N_ITER_AVERAGE):
+#             ransac = RANSAC(data_points)
+#             fit_circle = ransac.fit(Circle3D, n_iter, self.THRESHOLD)
+#             stransac_distance = np.mean(fit_circle.calc_distances(perfect_data))
+#             all_stransac_distances += stransac_distance
+#
+#             center, axis, radius, _ = pyransac_circle.fit(data_points, self.THRESHOLD, n_iter)
+#
+#             circle_from_pyransac = Circle3D(center, float(radius), axis)
+#             pyransac_distances = circle_from_pyransac.calc_distances(perfect_data)
+#             pyransac_rmse = np.mean(pyransac_distances)
+#             all_pyransac_distances += pyransac_rmse
+#
+#         starkit_ransac_avg_distance = all_stransac_distances / n_iter
+#         pyransac_avg_distance = all_pyransac_distances / n_iter
+#         print('starkit RMSE: ', starkit_ransac_avg_distance)
+#         print('pyransac RMSE: ', pyransac_avg_distance)
+#         self._append_result(
+#                 self.generate_result_dict(
+#                     n_iter, 
+#                     starkit_ransac_avg_distance,
+#                     pyransac_avg_distance,
+#                     len(data_points),
+#                     self.SHAPE_NAME
+#                 )
+#         )

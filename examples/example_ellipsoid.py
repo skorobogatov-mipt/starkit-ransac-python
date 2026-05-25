@@ -9,6 +9,7 @@ from starkit_ransac.generators.ellipsoid import (
 from starkit_ransac.ransac_3d import RANSAC
 from starkit_ransac.surfaces.ellipsoid import Ellipsoid3D
 from starkit_ransac.visualisation.visualize import (
+    PCD_COLOR,
     draw_pretty,
     generate_mesh,
     setup_visualizer,
@@ -35,7 +36,7 @@ def main():
 
     pcd = o3d.geometry.PointCloud()
     pcd.points = o3d.utility.Vector3dVector(data)
-    pcd.paint_uniform_color([0.9, 0.9, 0.9])
+    pcd.paint_uniform_color(PCD_COLOR)
 
     draw_pretty(
             [fitted_mesh, pcd],

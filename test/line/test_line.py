@@ -1,12 +1,12 @@
+import pdb
 from pyransac3d.line import Line
 import pytest
 import numpy as np
 from starkit_ransac.ransac_3d import RANSAC
 from starkit_ransac.surfaces.line3d import Line3D
 from starkit_ransac.generators.line3d import generate_line3d
-from conftest import BENCHMARK_THRESH, N_ITER_BENCHMARK, RNG
+from conftest import BENCHMARK_THRESH, N_ITER_BENCHMARK, RNG, AbstractTestPrecision
 from tqdm import tqdm
-from filelock import FileLock
 
 from pytest_benchmark.plugin import benchmark
 
@@ -100,7 +100,7 @@ class TestLine3D(LineGenerator):
         # Points not on the line should have non-zero distance
         points_off_line = np.array([[0, 1, 0], [1, 1, 0], [2, 1, 0]])
         distances = line.calc_distances(points_off_line)
-        assert np.allclose(np.linalg.norm(distances, axis=1), 1)
+        assert np.allclose(distances, 1)
 
 
 class TestBenchmarkLine3D(LineGenerator):
@@ -113,30 +113,8 @@ class TestBenchmarkLine3D(LineGenerator):
         line = pyransac3d.Line()
         benchmark(line.fit, data_points, BENCHMARK_THRESH, N_ITER_BENCHMARK)
 
-class TestPrecisionLine3D(LineGenerator):
-    n_iter_list = [500, 1000, 2000, 3000]
-    THRESHOLD = 0.1
-    N_ITER_AVERAGE = 10
+class TestPrecisionLine3D(LineGenerator, AbstractTestPrecision):
 
-    @pytest.fixture(scope="class", params=n_iter_list)
-    def n_iter(self, request):
-        return request.param
-    
-    RESULT_PATH = 'precision_comparison.json'
-    LOCK_PATH = RESULT_PATH + '.lock'
-
-    @staticmethod
-    def _append_result(result):
-        with FileLock(TestPrecisionLine3D.LOCK_PATH):
-            path = TestPrecisionLine3D.RESULT_PATH
-            if os.path.exists(path):
-                with open(path, 'r') as f:
-                    data = json.load(f)
-            else:
-                data = []
-            data.append(result)
-            with open(path, 'w') as f:
-                json.dump(data, f, indent=2)
     def test_compare_rmse(self, perfect_model, data_points, n_iter):
         all_stransac_distances = 0
         all_pyransac_distances = 0
@@ -145,27 +123,26 @@ class TestPrecisionLine3D(LineGenerator):
         for i in range(self.N_ITER_AVERAGE):
             ransac = RANSAC(data_points)
             fit_line = ransac.fit(Line3D, n_iter, self.THRESHOLD)
-            stransac_distance = np.mean(fit_line.calc_distances(perfect_data))
+            distances = fit_line.calc_distances(perfect_data)
+            stransac_distance = np.mean(distances)
             all_stransac_distances += stransac_distance
 
             A, B, _ = pyransac_line.fit(data_points, self.THRESHOLD, n_iter)
-            A = np.array(A)
-            B = np.array(B)
-            A = A / np.linalg.norm(A)
-            vecC_stakado = np.stack([A] * len(perfect_data), 0)
-            dist_pt = np.cross(vecC_stakado, (B - perfect_data))
-            dist_pt = np.linalg.norm(dist_pt, axis=1)
-            pyransac_distance = np.mean(dist_pt)
+            line = Line3D(A, B)
+            pyransac_distance = np.mean(line.calc_distances(perfect_data))
             all_pyransac_distances += pyransac_distance
 
         starkit_ransac_avg_distance = all_stransac_distances / n_iter
         pyransac_avg_distance = all_pyransac_distances / n_iter
         print('starkit RMSE: ', starkit_ransac_avg_distance)
         print('pyransac RMSE: ', pyransac_avg_distance)
-        self._append_result({
-            'n_iter' : n_iter,
-            'starkit_ransac RMSE' : starkit_ransac_avg_distance,
-            'pyransac RMSE' : pyransac_avg_distance,
-            'n data' : len(data_points)
-        })
+        self._append_result(
+                self.generate_result_dict(
+                    n_iter, 
+                    starkit_ransac_avg_distance,
+                    pyransac_avg_distance,
+                    len(data_points),
+                    self.SHAPE_NAME
+                )
+        )
 

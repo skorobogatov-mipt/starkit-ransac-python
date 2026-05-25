@@ -1,61 +1,19 @@
+from pyransac3d import Sphere as PyransacSphere
 import pytest
 import numpy as np
-from numpy.typing import ArrayLike, NDArray
-from starkit_ransac.surfaces.sphere import Sphere
 from starkit_ransac.ransac_3d import RANSAC
-from conftest import BENCHMARK_THRESH, N_ITER_BENCHMARK, RNG
+from starkit_ransac.surfaces.sphere import Sphere
 from starkit_ransac.generators.sphere import generate_sphere
+from conftest import BENCHMARK_THRESH, N_ITER_BENCHMARK, AbstractTestPrecision
+
 from pytest_benchmark.plugin import benchmark
 
 import pyransac3d
 import scuf
+from sphere_generator import SphereGenerator
 
 
-class TestSphere:
-    # numbers of variants of a parameter
-    N_CENTERS = 5
-    N_RADII = 5
-    MAX_OFFSET = 20
-
-    centers_list = (RNG.random((N_CENTERS, 3)) * MAX_OFFSET).tolist()
-
-    MAX_RADIUS = 5
-    radii_list = (
-        np.abs(RNG.random(N_RADII) * MAX_RADIUS) + 0.1  # ensure radius > 0
-    ).tolist()
-
-    @pytest.fixture(scope="class", params=centers_list)
-    def center(self, request):
-        return np.array(request.param)
-
-    @pytest.fixture(scope="class", params=radii_list)
-    def radius(self, request):
-        return request.param
-
-    @pytest.fixture(scope="class")
-    def perfect_model(self, center, radius):
-        return Sphere(center, radius)
-
-    @pytest.fixture(scope="class", params=[0.0, 0.01, 0.02, 0.05, 0.1])
-    def noise_sigma(self, request):
-        return request.param
-
-    @pytest.fixture(scope="class", params=[5000, 2500, 1000, 500])
-    def n_points(self, request):
-        return request.param
-
-    @pytest.fixture(scope="class")
-    def data_points(self, perfect_model, noise_sigma, n_points):
-        return generate_sphere(
-            perfect_model, noise_sigma=noise_sigma, n_points=n_points
-        )
-
-    @pytest.fixture(scope="class")
-    def fit_model(self, data_points):
-        ransac = RANSAC(data_points)
-        model = ransac.fit(Sphere, 5000, 0.1)
-        return model
-
+class TestSphere(SphereGenerator):
     @pytest.fixture()
     def acceptable_radius_relative_error(self):
         return 0.1
@@ -141,6 +99,9 @@ class TestSphere:
         expected = np.array([0.0, 0.5 * radius, 0.5 * radius])
         assert np.allclose(distances, expected)
 
+
+class TestBenchmarkSphere(SphereGenerator):
+
     def test_benchmark_starkit_ransac(self, data_points, benchmark):
         ransac = RANSAC(data_points)
         benchmark(ransac.fit, Sphere, N_ITER_BENCHMARK, BENCHMARK_THRESH)
@@ -153,4 +114,71 @@ class TestSphere:
         rs = scuf.ransac.RANSAC(figure="ellipsoid")
         benchmark(
             rs.fit, data_points, iterations=N_ITER_BENCHMARK, threshold=BENCHMARK_THRESH
+        )
+
+
+class TestPrecisionSphere(SphereGenerator, AbstractTestPrecision):
+
+    @staticmethod
+    def _scuf_ellipsoid_distances(points, center, radii, rotation):
+        # Transform points into the ellipsoid's principal frame
+        local = (points - center) @ rotation.T
+        norms = np.linalg.norm(local, axis=-1)
+        # Avoid division by zero for points exactly at the center
+        safe = np.where(norms > 0, norms, 1.0)
+        directions = local / safe[:, np.newaxis]
+        # Distance from center to ellipsoid surface along each direction
+        t = 1.0 / np.sqrt(np.sum((directions / radii) ** 2, axis=-1))
+        return np.abs(norms - t)
+
+    def test_compare_rmse(self, perfect_model, data_points, n_iter):
+        all_stransac_distances = 0
+        all_pyransac_distances = 0
+        all_scuf_distances = 0
+        perfect_data = generate_sphere(perfect_model, n_points=1000, noise_sigma=0)
+        pyransac_sphere = PyransacSphere()
+        scuf_ransac = scuf.ransac.RANSAC(figure='ellipsoid')
+        for i in range(self.N_ITER_AVERAGE):
+            ransac = RANSAC(data_points)
+            fit_sphere = ransac.fit(Sphere, n_iter, self.THRESHOLD)
+            stransac_distance = np.mean(fit_sphere.calc_distances(perfect_data))
+            all_stransac_distances += stransac_distance
+
+            center, radius, _ = pyransac_sphere.fit(
+                data_points, self.THRESHOLD, n_iter
+            )
+            center = np.array(center)
+            dist_pt = np.abs(
+                np.linalg.norm(perfect_data - center, axis=-1) - radius
+            )
+            pyransac_distance = np.mean(dist_pt)
+            all_pyransac_distances += pyransac_distance
+
+            _, (scuf_center, scuf_radii, scuf_rotation) = scuf_ransac.fit(
+                data_points, iterations=n_iter, threshold=self.THRESHOLD
+            )
+            scuf_dist_pt = self._scuf_ellipsoid_distances(
+                perfect_data,
+                np.array(scuf_center),
+                np.array(scuf_radii),
+                np.array(scuf_rotation),
+            )
+            scuf_distance = np.mean(scuf_dist_pt)
+            all_scuf_distances += scuf_distance
+
+        starkit_ransac_avg_distance = all_stransac_distances / n_iter
+        pyransac_avg_distance = all_pyransac_distances / n_iter
+        scuf_avg_distance = all_scuf_distances / n_iter
+        print('starkit RMSE: ', starkit_ransac_avg_distance)
+        print('pyransac RMSE: ', pyransac_avg_distance)
+        print('scuf RMSE: ', scuf_avg_distance)
+        self._append_result(
+            self.generate_result_dict(
+                n_iter,
+                starkit_ransac_avg_distance,
+                pyransac_avg_distance,
+                len(data_points),
+                self.SHAPE_NAME,
+                scuf_rmse=scuf_avg_distance,
+            )
         )

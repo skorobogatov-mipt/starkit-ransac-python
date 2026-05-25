@@ -1,62 +1,19 @@
+from pyransac3d.plane import Plane
 import pytest
 import numpy as np
 from starkit_ransac.ransac_3d import RANSAC
 from starkit_ransac.surfaces.plane import Plane3D
 from starkit_ransac.generators.plane import generate_plane
-from conftest import BENCHMARK_THRESH, N_ITER_BENCHMARK, RNG
+from conftest import BENCHMARK_THRESH, N_ITER_BENCHMARK, AbstractTestPrecision
 
 from pytest_benchmark.plugin import benchmark
 
 import pyransac3d
 import scuf
+from plane_generator import PlaneGenerator
 
 
-class TestPlane3D:
-    approx_center_list = [[10, 54.2, 100], [0, 0, 0], [-4.2, 5.76, -1.228]]
-    coeffs_list = [
-        [1, 1, 1, 0],
-        [0, 2, 5, 10],
-        [-345, 0, 1235, 23.1],
-        [-0.054, 123, 0, 482.5748],
-        [-0.8, 0.9, 3.57, 5.423],
-    ]
-
-    @pytest.fixture(scope="class", params=coeffs_list)
-    def coeffs(self, request):
-        return np.array(request.param, float)
-
-    @pytest.fixture(scope="class", params=approx_center_list)
-    def approx_center(self, request):
-        return np.array(request.param, float)
-
-    @pytest.fixture(scope="class")
-    def perfect_model(self, coeffs):
-        return Plane3D(*coeffs)
-
-    @pytest.fixture(scope="class", params=[0.0, 0.01, 0.02, 0.05, 0.1])
-    def noise_sigma(self, request):
-        return request.param
-
-    @pytest.fixture(scope="class", params=[5000, 2500, 1000, 500])
-    def n_points(self, request):
-        return request.param
-
-    @pytest.fixture(scope="class")
-    def data_points(self, perfect_model, noise_sigma, n_points, approx_center):
-        return generate_plane(
-            perfect_model,
-            noise_sigma=noise_sigma,
-            n_points=n_points,
-            approx_center=approx_center,
-            plane_size=1,
-        )
-
-    @pytest.fixture(scope="class")
-    def fit_model(self, data_points):
-        ransac = RANSAC(data_points)
-        model = ransac.fit(Plane3D, iter_num=1000, distance_threshold=0.1)
-        return model
-
+class TestPlane3D(PlaneGenerator):
     @pytest.fixture()
     def acceptable_relative_coeff_error(self):
         return 0.1
@@ -98,6 +55,8 @@ class TestPlane3D:
 
         assert rmse < acceptable_point_rmse
 
+class TestBenchmarkPlane3D(PlaneGenerator):
+
     def test_benchmark_starkit_ransac(self, data_points, benchmark):
         ransac = RANSAC(data_points)
         benchmark(ransac.fit, Plane3D, N_ITER_BENCHMARK, BENCHMARK_THRESH)
@@ -105,3 +64,36 @@ class TestPlane3D:
     def test_benchmark_pyransac(self, data_points, benchmark):
         line = pyransac3d.Plane()
         benchmark(line.fit, data_points, BENCHMARK_THRESH, N_ITER_BENCHMARK)
+
+class TestPrecisionPlane3D(PlaneGenerator, AbstractTestPrecision):
+    def test_compare_rmse(self, perfect_model, data_points, n_iter):
+        all_stransac_distances = 0
+        all_pyransac_distances = 0
+        perfect_data = generate_plane(perfect_model, 0, 1000)
+        pyransac_plane = Plane()
+        for i in range(self.N_ITER_AVERAGE):
+            ransac = RANSAC(data_points)
+            fit_plane = ransac.fit(Plane3D, n_iter, self.THRESHOLD)
+            stransac_distance = np.mean(fit_plane.calc_distances(perfect_data))
+            all_stransac_distances += stransac_distance
+
+            (A, B, C, D) , _ = pyransac_plane.fit(data_points, self.THRESHOLD, n_iter)
+
+            plane_from_pyransac = Plane3D(A, B, C, D)
+            pyransac_distances = plane_from_pyransac.calc_distances(perfect_data)
+            pyransac_rmse = np.mean(pyransac_distances)
+            all_pyransac_distances += pyransac_rmse
+
+        starkit_ransac_avg_distance = all_stransac_distances / n_iter
+        pyransac_avg_distance = all_pyransac_distances / n_iter
+        print('starkit RMSE: ', starkit_ransac_avg_distance)
+        print('pyransac RMSE: ', pyransac_avg_distance)
+        self._append_result(
+                self.generate_result_dict(
+                    n_iter, 
+                    starkit_ransac_avg_distance,
+                    pyransac_avg_distance,
+                    len(data_points),
+                    self.SHAPE_NAME
+                )
+        )

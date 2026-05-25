@@ -4,6 +4,7 @@ from starkit_ransac.surfaces.sphere import Sphere
 from starkit_ransac.generators.sphere import generate_sphere
 from starkit_ransac.visualisation.sphere import generate_sphere_mesh
 from starkit_ransac.visualisation.visualize import (
+    PCD_COLOR,
     draw_pretty,
     generate_mesh,
     setup_visualizer,
@@ -23,7 +24,7 @@ def main():
 
     pcd = o3d.geometry.PointCloud()
     pcd.points = o3d.utility.Vector3dVector(data)
-    pcd.paint_uniform_color([0.9] * 3)
+    pcd.paint_uniform_color(PCD_COLOR)
 
     draw_pretty(
         [mesh, pcd], 

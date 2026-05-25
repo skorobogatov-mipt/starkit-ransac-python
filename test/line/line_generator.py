@@ -18,6 +18,8 @@ class LineGenerator():
     )
     directions_list = directions_list.tolist()
 
+    SHAPE_NAME = 'line'
+
     @pytest.fixture(scope="class", params=points_list)
     def point(self, request):
         return np.array(request.param)

@@ -1,3 +1,4 @@
+import pdb
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 from starkit_ransac.abstract_surface import AbstractSurfaceModel
@@ -30,7 +31,8 @@ class Line3D(AbstractSurfaceModel):
         distances = (a - points) - np.outer(
             np.dot((a - points), self.direction), self.direction
         )
-        return np.linalg.norm(distances, axis=1)
+        result = np.linalg.norm(distances, axis=1)
+        return result
 
     def calc_distance_one_point(self, point):
         return self.calc_distance_one_point([point])[0]

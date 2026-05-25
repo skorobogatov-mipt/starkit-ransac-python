@@ -34,7 +34,7 @@ TYPE_TO_GENERATOR = {
 }
 
 
-def generate_mesh(surface, resolution=100, color=(0, 1, 0)):
+def generate_mesh(surface, resolution=100, color=(1, 1, 1)):
     surface_type = type(surface)
     func = TYPE_TO_GENERATOR[surface_type]
     return func(surface, resolution=resolution, color=color)
@@ -43,14 +43,18 @@ def generate_mesh(surface, resolution=100, color=(0, 1, 0)):
 def setup_visualizer(winname="RASNAC", line_width=7, point_size=2): 
     o3d.visualization.gui.Application.instance.initialize()
     vis = o3d.visualization.O3DVisualizer(winname, 480, 480)
-    color = np.full(4, 0.2)
-    color[-1] = 1
+    #00ac5a
+    color = [0, 0.67, 0.35, 1]
+    # color = np.full(4, 0.2)
+    # color[-1] = 1
     vis.set_background(color, None)
     vis.show_skybox(False)
     vis.line_width = line_width
     vis.point_size = point_size
     vis.setup_camera(80, [0, 0, 0], [15, 0, 0], [0, 0, 1])
     return vis
+
+PCD_COLOR = [0] * 3
 
 def draw_pretty(
         geom, 
