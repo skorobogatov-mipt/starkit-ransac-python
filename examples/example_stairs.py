@@ -37,7 +37,7 @@ def main():
     )
     ransac = RANSAC()
     ransac.add_points(data)
-    model = ransac.fit(StepPlane, 1200, 0.06)
+    model = ransac.fit(StepPlane, 100000, 0.06)
     mesh = generate_mesh(model, color=(0, 0.5, 0))
     pcd = o3d.geometry.PointCloud()
     pcd.points = o3d.utility.Vector3dVector(data)

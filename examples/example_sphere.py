@@ -13,9 +13,9 @@ from starkit_ransac.visualisation.visualize import (
 
 def main():
     perfect_sphere = Sphere([5, -9, 3], 6.9)
-    data = generate_sphere(perfect_sphere, noise_sigma=0.1, n_points=1000)
+    data = generate_sphere(perfect_sphere, noise_sigma=0.2, n_points=1000)
     ransac = RANSAC(data)
-    model = ransac.fit(Sphere, 10, 0.05)
+    model = ransac.fit(Sphere, 100000, 0.05)
 
     print(perfect_sphere.radius)
     print(model.center)

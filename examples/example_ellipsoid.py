@@ -28,7 +28,7 @@ def main():
     perfect_ellipsoid = Ellipsoid3D(
         axes=axes, radii=[3.6, 3, 5], center=np.random.random(3)
     )
-    data = generate_ellipsoid(perfect_ellipsoid, n_points=5000, noise_sigma=0.05)
+    data = generate_ellipsoid(perfect_ellipsoid, n_points=5000, noise_sigma=0.2)
     ransac = RANSAC(data)
     model: Ellipsoid3D = ransac.fit(Ellipsoid3D, 5000, 0.05)
 

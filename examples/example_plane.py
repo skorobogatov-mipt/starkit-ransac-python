@@ -14,10 +14,10 @@ def main():
         c=np.random.random(),
         d=np.random.random(),
     )
-    data = generate_plane(perfect_plane)
+    data = generate_plane(perfect_plane, noise_sigma=0.5)
 
     ransac = RANSAC(data)
-    fit_plane = ransac.fit(Plane3D, 1000, 0.05)
+    fit_plane = ransac.fit(Plane3D, 100000, 0.05)
 
     mesh = generate_mesh(fit_plane, color=[0.0, 0.7, 0])
 

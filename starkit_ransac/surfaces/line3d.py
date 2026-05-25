@@ -8,7 +8,7 @@ from starkit_ransac.utils import normalize
 class Line3D(AbstractSurfaceModel):
 
     def __init__(
-        self, direction: ArrayLike | None = None, point: ArrayLike | None = None
+        self, direction: ArrayLike=np.full(3, np.nan), point: ArrayLike=np.full(3, np.nan) 
     ) -> None:
         if direction is not None:
             direction = np.array(direction)

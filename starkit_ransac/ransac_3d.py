@@ -1,20 +1,27 @@
+import open3d as o3d
+import pdb
+from starkit_ransac.generators.ellipsoid import generate_ellipsoid
+from time import sleep
 import numpy as np
 from numpy.typing import NDArray
 from starkit_ransac.abstract_surface import AbstractSurfaceModel
 from copy import deepcopy
 
-
+from starkit_ransac.visualisation.visualize import generate_mesh, setup_visualizer
 
 class RANSAC:
     """RANSAC algorithm implementation for 3D surface fitting.
-
+    
     This class implements the Random Sample Consensus (RANSAC) algorithm
     for robust fitting of geometric surface models to 3D point cloud data.
     """
-
-    def __init__(self, data: NDArray | None = None) -> None:
+    
+    def __init__(
+            self,
+            data:NDArray|None=None
+        ) -> None:
         """Initialize the RANSAC3D object with an empty point cloud.
-
+        
         Returns
         -------
         None
@@ -24,9 +31,12 @@ class RANSAC:
         else:
             self.__data = np.copy(data)
 
-    def load_data_from_file(self, path_to_file: str):
+    def load_data_from_file(
+            self,
+            path_to_file: str
+            ):
         """Load point cloud data from a file.
-
+        
         Parameters
         ----------
         path_to_file : str
@@ -34,15 +44,17 @@ class RANSAC:
         """
         raise NotImplementedError
 
-    def add_points(self, points: NDArray):
+    def add_points(
+            self,
+            points: NDArray):
         """Add points to the internal point cloud data.
-
+        
         Parameters
         ----------
         points : NDArray
             Array of 3D points to add, shape (N, 3) where N is the number of
             points.
-
+            
         Returns
         -------
         None
@@ -52,12 +64,17 @@ class RANSAC:
         else:
             self.__data = np.concatenate((self.__data, points))
 
-    def fit(self, object_type: type, iter_num: int, distance_threshold: float):
+    def fit(
+            self, 
+            object_type: type,
+            iter_num: int,
+            distance_threshold: float
+        ):
         """Fit a surface model to the point cloud using RANSAC.
-
+        
         Performs iterative random sampling and model fitting to find
         the best surface model that maximizes the number of inliers.
-
+        
         Parameters
         ----------
         object_type : type
@@ -67,7 +84,7 @@ class RANSAC:
             Number of RANSAC iterations to perform.
         distance_threshold : float
             Maximum distance for a point to be considered an inlier.
-
+            
         Returns
         -------
         best_model : AbstractSurfaceModel
@@ -75,68 +92,114 @@ class RANSAC:
         """
         self.__distance_threshold = distance_threshold
         self.model: AbstractSurfaceModel = object_type()
-
+        
         best_model: AbstractSurfaceModel = None
         best_model_score = -1
 
-        n_data = self.__data.shape[0]
-        # random_matrix = np.random.rand(iter_num, self.__data.shape[0])
-        # indices = np.random.choice(
-        #         self.__data.shape[0],
-        #         size=(iter_num, self.model.num_samples),
-        #         replace=False
-        # )
-        # indices = np.argpartition(random_matrix, self.model.num_samples, axis=1)[:, :self.model.num_samples]
-        indices = np.random.randint(0, n_data, (iter_num, self.model.num_samples))
-        for idx in indices:
+        best_model_mesh = generate_mesh(self.model, color=(1,0,0), resolution=5)
 
-            if len(np.unique(idx)) != self.model.num_samples:
-                idx = np.random.choice(
-                    n_data, size=self.model.num_samples, replace=False
+        pcd = o3d.geometry.PointCloud()
+        pcd.points = o3d.utility.Vector3dVector(self.__data)
+        pcd.paint_uniform_color([0]*3)
+
+        hypothesis_mesh = generate_mesh(self.model, resolution=5)
+
+        # visualization stuff
+        vis = setup_visualizer(point_size=4)
+        orbit_radius = 3
+        data_center = np.mean(self.__data, axis=0)
+        camera_pos = data_center + [4,4,1]
+        vis.setup_camera(
+            80,
+            data_center,
+            camera_pos,
+            [0,0,1]
+        )
+        vis.add_geometry("pcd", pcd)
+
+        i = 0
+        angle = 0.
+        for _ in range(iter_num):
+            i += 1
+            # this is for camera rotation
+            for k in range(5):
+                camera_pos[0] = orbit_radius * np.cos(angle)
+                camera_pos[1] = orbit_radius * np.sin(angle)
+                camera_pos[2] = 1
+                camera_pos += data_center
+                vis.setup_camera(
+                    80,
+                    pcd.get_center(),
+                    camera_pos,
+                    [0,0,1]
                 )
+                angle += 0.002
+                sleep(0.001)
 
-            sample = self.__data[idx]
+            sample = self.__sample()
             success = self.model.fit_model(sample)
             if not success:
                 continue
 
+            if i%30 == 0:
+                vis.remove_geometry("hypothesis_mesh")
+                hypothesis_mesh = generate_mesh(self.model, color=(1,0,0), resolution=20)
+                vis.add_geometry("hypothesis_mesh", hypothesis_mesh)
+
             distances = self.model.calc_distances(self.__data)
             score = self.__score_from_distances(distances)
+            
             if score > best_model_score:
+                vis.remove_geometry("best_model_mesh")
                 best_model = deepcopy(self.model)
                 best_model_score = score
 
+                best_model_mesh = generate_mesh(best_model, resolution=20)
+                vis.add_geometry("best_model_mesh", best_model_mesh)
+
+            vis.post_redraw()
+            o3d.visualization.gui.Application.instance.run_one_tick()
+        
+        vis.close()
         return best_model
-
-    def __score_from_distances(self, distances: NDArray) -> float:
+    def __score_from_distances(
+            self,
+            distances: NDArray
+            ) -> float:
         """
-        Calculate the inlier score from point-to-surface distances.
-
-        Parameters
-        ----------
-        distances : NDArray
-            Array of distances from each point to the fitted surface.
-
-        Returns
-        -------
-        score : float
-            The number of points within the distance threshold (inlier count).
+            Calculate the inlier score from point-to-surface distances.
+            
+            Parameters
+            ----------
+            distances : NDArray
+                Array of distances from each point to the fitted surface.
+                
+            Returns
+            -------
+            score : float
+                The number of points within the distance threshold (inlier count).
         """
 
         return np.sum(distances <= self.__distance_threshold)
 
-    def __sample(self) -> NDArray:
+    def __sample(
+            self
+        ) -> NDArray:
         """Randomly sample points from the point cloud for model fitting.
-
+        
         Selects a random subset of points equal to the number required
         by the current model (model.num_samples) without replacement.
-
+        
         Returns
         -------
         sample : NDArray
             Array of randomly sampled points, shape (num_samples, 3).
         """
         indices = np.random.choice(
-            self.__data.shape[0], size=self.model.num_samples, replace=False
+                self.__data.shape[0], 
+                size=self.model.num_samples,
+                replace=False
         )
         return self.__data[indices]
+
+

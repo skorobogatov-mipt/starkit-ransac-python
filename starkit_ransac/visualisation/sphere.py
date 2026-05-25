@@ -1,9 +1,10 @@
+import pdb
 import numpy as np
 from starkit_ransac.surfaces.sphere import Sphere
 import open3d as o3d
 
 
-def generate_sphere_mesh(sphere: Sphere, color=[0, 1, 0], resolution: int = 50):
+def generate_sphere_mesh(sphere: Sphere, color=[0, 1, 0], resolution: int = 1):
     R = sphere.radius
     if R is None:
         return o3d.geometry.LineSet()

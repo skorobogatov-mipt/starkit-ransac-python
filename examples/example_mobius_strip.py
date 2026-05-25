@@ -20,10 +20,10 @@ def main():
         start_vector=[0, 0, 1],
         width=2,
     )
-    data = generate_mobius(sample_mobius, n_points=1000, noise_sigma=0)
+    data = generate_mobius(sample_mobius, n_points=1000, noise_sigma=0.05)
     ransac = RANSAC()
     ransac.add_points(data)
-    fitted = ransac.fit(MobiusStrip, 50, 0.01)
+    fitted = ransac.fit(MobiusStrip, 100000, 0.01)
     mesh = generate_mesh(fitted, resolution=5)
 
     pcd = o3d.geometry.PointCloud()
