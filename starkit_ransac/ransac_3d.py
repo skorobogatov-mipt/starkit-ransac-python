@@ -1,8 +1,8 @@
+from typing import Tuple
 import numpy as np
 from numpy.typing import NDArray
 from starkit_ransac.abstract_surface import AbstractSurfaceModel
 from copy import deepcopy
-
 
 
 class RANSAC:
@@ -13,7 +13,7 @@ class RANSAC:
     """
 
     def __init__(self, data: NDArray | None = None) -> None:
-        """Initialize the RANSAC3D object with an empty point cloud.
+        """Initialize the RANSAC3D object with a point cloud.
 
         Returns
         -------
@@ -52,7 +52,13 @@ class RANSAC:
         else:
             self.__data = np.concatenate((self.__data, points))
 
-    def fit(self, object_type: type, iter_num: int, distance_threshold: float):
+    def fit(
+        self,
+        object_type: type,
+        iter_num: int,
+        distance_threshold: float,
+        return_inliers: bool = False,
+    ) -> AbstractSurfaceModel | Tuple[AbstractSurfaceModel, np.typing.NDArray]:
         """Fit a surface model to the point cloud using RANSAC.
 
         Performs iterative random sampling and model fitting to find
@@ -80,14 +86,8 @@ class RANSAC:
         best_model_score = -1
 
         n_data = self.__data.shape[0]
-        # random_matrix = np.random.rand(iter_num, self.__data.shape[0])
-        # indices = np.random.choice(
-        #         self.__data.shape[0],
-        #         size=(iter_num, self.model.num_samples),
-        #         replace=False
-        # )
-        # indices = np.argpartition(random_matrix, self.model.num_samples, axis=1)[:, :self.model.num_samples]
         indices = np.random.randint(0, n_data, (iter_num, self.model.num_samples))
+        best_inliers = np.array([])
         for idx in indices:
 
             if len(np.unique(idx)) != self.model.num_samples:
@@ -104,9 +104,13 @@ class RANSAC:
             score = self.__score_from_distances(distances)
             if score > best_model_score:
                 best_model = deepcopy(self.model)
+                best_inliers = self.__data[distances <= distance_threshold]
                 best_model_score = score
 
-        return best_model
+        if return_inliers:
+            return best_model, best_inliers
+        else:
+            return best_model
 
     def __score_from_distances(self, distances: NDArray) -> float:
         """

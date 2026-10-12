@@ -54,11 +54,11 @@ def plot_comparison(lib1, lib2, avgs, w=0.4):
 
     plt.bar(lib1_bar, lib1_avgs, w, label=lib1)
     plt.bar(lib2_bar, avgs[lib2].values(), w, label=lib2)
-    plt.xticks(lib2_bar - w / 2, lib2_shapes, fontsize=24)
-    plt.yticks(fontsize=24)
-    plt.ylabel("Time per RANSAC run, s", fontsize=32)
-    plt.xlabel("Shapes", fontsize=32)
-    plt.legend(fontsize=32)
+    plt.xticks(lib2_bar - w / 2, lib2_shapes, fontsize=14)
+    plt.yticks(fontsize=14)
+    plt.ylabel("Time per RANSAC run, s", fontsize=24)
+    plt.xlabel("Shapes", fontsize=24)
+    plt.legend(fontsize=24)
     plt.show()
 
 def main():
